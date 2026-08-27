@@ -1,0 +1,147 @@
+import os
+from dataclasses import dataclass
+from typing import Dict, Set, Tuple, List
+import graphviz
+
+# Configuración automática del PATH de Graphviz en Windows
+rutas_posibles = [
+    r"C:\Program Files\Graphviz\bin",
+    r"C:\Program Files (x86)\Graphviz\bin",
+    os.path.expandvars(r"%LOCALAPPDATA%\Programs\Graphviz\bin"),
+    os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\Graphviz\bin"),
+]
+for ruta in rutas_posibles:
+    if os.path.isdir(ruta) and ruta not in os.environ["PATH"]:
+        os.environ["PATH"] += os.pathsep + ruta
+
+@dataclass
+class DFA:
+    states: Set[str]
+    alphabet: Set[str]
+    transition: Dict[Tuple[str, str], str]
+    start_state: str
+    accept_states: Set[str]
+
+    def step(self, state: str, symbol: str) -> str:
+        key = (state, symbol)
+        if key not in self.transition:
+            raise ValueError(f"No hay transición definida para {key}")
+        return self.transition[key]
+
+    def simulate(self, input_symbols: List[str]):
+        current = self.start_state
+        log = []
+        for i, sym in enumerate(input_symbols):
+            if sym not in self.alphabet:
+                raise ValueError(f"Símbolo inválido: '{sym}'. Alfabeto: {sorted(self.alphabet)}")
+            nxt = self.step(current, sym)
+            log.append((i, current, sym, nxt))
+            current = nxt
+        return current, log
+
+# ---------------------------------------------------------------------------
+# Definición formal del Ejercicio 3 (Múltiples Especialidades)
+# ---------------------------------------------------------------------------
+states_p3 = {
+    "Inicio",
+    "EspecialidadBroncopulmonar",
+    "EspecialidadRadiologo",
+    "SeleccionarMedico",
+    "SeleccionarFecha",
+    "ConfirmarDatos",
+    "Pago",
+    "CitaAgendada"
+}
+
+alphabet_p3 = {
+    "broncopulmonar",
+    "radiologo",
+    "medico",
+    "fecha",
+    "confirmar",
+    "pago",
+    "cancelar"
+}
+
+transition_p3 = {
+    # Bifurcación desde Inicio según la especialidad
+    ("Inicio", "broncopulmonar"): "EspecialidadBroncopulmonar",
+    ("Inicio", "radiologo"): "EspecialidadRadiologo",
+
+    # Convergencia hacia SeleccionarMedico
+    ("EspecialidadBroncopulmonar", "medico"): "SeleccionarMedico",
+    ("EspecialidadRadiologo", "medico"): "SeleccionarMedico",
+
+    # Flujo común posterior (Preguntas 1 y 2)
+    ("SeleccionarMedico", "fecha"): "SeleccionarFecha",
+    ("SeleccionarFecha", "confirmar"): "ConfirmarDatos",
+    ("ConfirmarDatos", "pago"): "Pago",
+    ("Pago", "confirmar"): "CitaAgendada",
+
+    # Cancelaciones hacia el estado inicial
+    ("EspecialidadBroncopulmonar", "cancelar"): "Inicio",
+    ("EspecialidadRadiologo", "cancelar"): "Inicio",
+    ("SeleccionarMedico", "cancelar"): "Inicio",
+    ("SeleccionarFecha", "cancelar"): "Inicio",
+    ("ConfirmarDatos", "cancelar"): "Inicio",
+    ("Pago", "cancelar"): "Inicio"
+}
+
+dfa_p3 = DFA(states_p3, alphabet_p3, transition_p3, "Inicio", {"CitaAgendada"})
+
+# ---------------------------------------------------------------------------
+# Simulación (Prueba con rama Broncopulmonar)
+# ---------------------------------------------------------------------------
+secuencia_p3 = ["broncopulmonar", "medico", "fecha", "confirmar", "pago", "confirmar"]
+estado_final_p3, log_p3 = dfa_p3.simulate(secuencia_p3)
+
+print("\n" + "=" * 60)
+print(" RESULTADOS DE EJECUCIÓN - EJERCICIO 3")
+print("=" * 60)
+print(f"Secuencia ingresada : {secuencia_p3}")
+print(f"Estado final        : {estado_final_p3}")
+print(f"¿Cita agendada?     : {estado_final_p3 in dfa_p3.accept_states}")
+
+print("\n" + "-" * 60)
+print(f"{'#':<3} | {'Estado actual':<26} | {'Entrada':<15} | {'Nuevo estado'}")
+print("-" * 60)
+for i, curr, sym, nxt in log_p3:
+    print(f"{i:<3} | {curr:<26} | {sym:<15} | {nxt}")
+print("-" * 60)
+
+# Generación del archivo PNG
+def guardar_grafo(dfa: DFA, log: List, final_state: str, filename="ejercicio_3"):
+    dot = graphviz.Digraph(format="png")
+    dot.attr(rankdir="LR")
+    dot.node("", shape="point")
+
+    for s in dfa.states:
+        shape = "doublecircle" if s in dfa.accept_states else "circle"
+        penwidth = "3" if s == final_state else "1"
+        color = "green" if s == final_state and s in dfa.accept_states else "black"
+        dot.node(s, shape=shape, penwidth=penwidth, color=color)
+
+    dot.edge("", dfa.start_state)
+
+    edges_labels = {}
+    for (src, sym), dst in dfa.transition.items():
+        edges_labels.setdefault((src, dst), []).append(sym)
+
+    highlighted_pairs = set((src, dst) for (_, src, sym, dst) in log)
+
+    for (src, dst), syms in edges_labels.items():
+        label = ", ".join(sorted(syms))
+        if (src, dst) in highlighted_pairs:
+            dot.edge(src, dst, label=label, color="blue", penwidth="2")
+        else:
+            dot.edge(src, dst, label=label)
+
+    try:
+        dot.render(filename, cleanup=True)
+        print(f"\n[OK] Imagen del grafo guardada como: {filename}.png")
+    except Exception as e:
+        print(f"\n[Aviso] Graphviz no pudo renderizar directamente: {e}")
+        print("\nCódigo DOT para dreampuf.github.io/GraphvizOnline:")
+        print(dot.source)
+
+guardar_grafo(dfa_p3, log_p3, estado_final_p3)
