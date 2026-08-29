@@ -1,5 +1,4 @@
 import os
-import shutil
 from dataclasses import dataclass
 from typing import Dict, Set, Tuple, List
 import graphviz

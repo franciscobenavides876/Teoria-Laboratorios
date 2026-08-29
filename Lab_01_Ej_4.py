@@ -176,3 +176,29 @@ def guardar_grafo(dfa: DFA, log: List, final_state: str, filename="ejercicio_4")
         print(dot.source)
 
 guardar_grafo(dfa_p4, log_p4, estado_final_p4)
+
+# ---------------------------------------------------------------------------
+# Justificación de las decisiones de diseño (Ejercicio 4)
+# ---------------------------------------------------------------------------
+print("\n" + "=" * 60)
+print(" JUSTIFICACIÓN DE DISEÑO - EJERCICIO 4")
+print("=" * 60)
+print(
+    "- Se agregó un único estado 'Error' (no uno por cada tipo de fallo) para\n"
+    "  mantener el autómata simple: no importa qué símbolo inválido se haya\n"
+    "  ingresado, el sistema solo necesita informar que la acción no es\n"
+    "  válida en el contexto actual y ofrecer una forma de recuperarse.\n"
+    "- El DFA se 'totaliza' recorriendo el producto cartesiano Estados x\n"
+    "  Alfabeto: toda combinación (estado, símbolo) que no estaba definida\n"
+    "  en el Ejercicio 3 pasa explícitamente a 'Error'. Esto cumple con la\n"
+    "  definición formal de un DFA, que exige una función de transición\n"
+    "  total (definida para todo par estado-símbolo).\n"
+    "- Desde 'Error' solo 'cancelar' es una transición válida y lleva de\n"
+    "  vuelta a 'Inicio'; cualquier otro símbolo mantiene al autómata en\n"
+    "  'Error' (auto-transición), evitando que el usuario quede 'atascado'\n"
+    "  sin una vía de escape clara.\n"
+    "- Desde 'CitaAgendada' (estado de aceptación) también se totalizó la\n"
+    "  función: cualquier símbolo que no sea 'cancelar' mantiene al usuario\n"
+    "  en 'CitaAgendada' (la cita ya está hecha, no hay más acciones\n"
+    "  posibles), y 'cancelar' permite iniciar un nuevo proceso desde cero."
+)

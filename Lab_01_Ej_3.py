@@ -145,3 +145,24 @@ def guardar_grafo(dfa: DFA, log: List, final_state: str, filename="ejercicio_3")
         print(dot.source)
 
 guardar_grafo(dfa_p3, log_p3, estado_final_p3)
+
+# ---------------------------------------------------------------------------
+# Justificación de las decisiones de diseño (Ejercicio 3)
+# ---------------------------------------------------------------------------
+print("\n" + "=" * 60)
+print(" JUSTIFICACIÓN DE DISEÑO - EJERCICIO 3")
+print("=" * 60)
+print(
+    "- Se crearon dos estados distintos, 'EspecialidadBroncopulmonar' y\n"
+    "  'EspecialidadRadiologo', en lugar de un único estado genérico, porque\n"
+    "  cada especialidad podría requerir en el futuro sub-flujos propios\n"
+    "  (por ejemplo, exámenes previos distintos) sin romper el resto del DFA.\n"
+    "- Ambas ramas convergen en el mismo estado 'SeleccionarMedico' porque,\n"
+    "  desde la perspectiva del usuario, una vez elegida la especialidad el\n"
+    "  resto del proceso (elegir médico, fecha, confirmar, pagar) es idéntico.\n"
+    "  Esto evita duplicar estados y transiciones innecesariamente.\n"
+    "- La bifurcación ocurre solo en 'Inicio', ya que es el único punto donde\n"
+    "  el usuario decide la especialidad; cualquier símbolo de especialidad\n"
+    "  fuera de ese estado no está definido (y en el Ejercicio 4 se maneja\n"
+    "  como transición inválida hacia el estado 'Error')."
+)
