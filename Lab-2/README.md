@@ -73,10 +73,34 @@ Lab-2/
 
 ## Checklist de avance
 
-- [ ] P1: ER explicada + AFN + predicciones/verificación + captura
-- [ ] P2: ER diseñada + justificación + AFN + ≥10 pruebas + captura
-- [ ] P3: ER + AFN + AFD + tabla de características + ≥8 pruebas + capturas
-- [ ] P4: ER + AFN + AFD + ≥12 pruebas + reflexión + capturas
-- [ ] Archivos `.jff` con los nombres indicados
+- [x] P1: ER explicada + AFN + predicciones/verificación ✅ (pendiente: captura JFLAP)
+- [x] P2: ER diseñada + justificación + AFN + 12 pruebas ✅ (pendiente: captura JFLAP)
+- [x] P3: ER + AFN + AFD + tabla de características + 8 pruebas ✅ (pendiente: capturas JFLAP)
+- [x] P4: ER + AFN + AFD + 12 pruebas + reflexión ✅ (pendiente: capturas JFLAP)
+- [x] Archivos `.jff` con los nombres indicados ✅ (generados y validados por `generar_jff.py`)
 - [ ] Informe PDF `Lab02_jefe_nombre_apellido.pdf`
 - [ ] Enlace en anexos con acceso habilitado
+
+## Estado actual del área de trabajo
+
+```
+Lab-2/
+├── README.md              ← este archivo (plan de trabajo)
+├── generar_jff.py         ← genera y valida los archivos .jff (verificación exhaustiva)
+├── P1_AFN.jff             ← Pregunta 1: AFN de (0+1)*01            (8 est., 10 trans., 6 λ)
+├── P2_AFN.jff             ← Pregunta 2: AFN de L₂ = a(a+b)*b       (8 est., 10 trans., 6 λ)
+├── P3_AFN.jff             ← Pregunta 3: AFN de L₃ contiene "101"   (14 est., 19 trans., 12 λ)
+├── P3_AFD.jff             ← Pregunta 3: AFD equivalente            (4 est., 8 trans.)
+├── P4_AFN.jff             ← Pregunta 4: AFN (≥1 a y termina bb)    (14 est., 19 trans., 12 λ)
+├── P4_AFD.jff             ← Pregunta 4: AFD equivalente            (4 est., 8 trans.)
+├── capturas/              ← capturas de JFLAP (P1_AFN, P2_AFN, P3_AFN, P3_AFD, P4_ER, P4_AFN, P4_AFD)
+└── informe/
+    └── Lab02_informe.md   ← borrador completo del informe (tablas y explicaciones listas)
+```
+
+**Pendientes antes de entregar:**
+1. Abrir cada `.jff` en JFLAP, ejecutar las cadenas de las tablas y confirmar
+   los resultados (deben coincidir con lo validado).
+2. Adjuntar las capturas legibles en `capturas/` y referenciarlas en el informe.
+3. Completar nombres de la pareja, enlace del anexo y exportar
+   `Lab02_informe.md` a PDF con el nombre indicado.
