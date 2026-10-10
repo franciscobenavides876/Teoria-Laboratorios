@@ -118,18 +118,18 @@ límite** marcados en la tabla:
 
 | Cadena     | Resultado esperado | Resultado JFLAP | Observación                          |
 |------------|--------------------|-----------------|--------------------------------------|
-| `ab`       | Aceptada           | Aceptada        | Longitud mínima / caso límite 1      |
-| `aab`      | Aceptada           | Aceptada        | Intermedia con `a`                   |
-| `abb`      | Aceptada           | Aceptada        | Dos `b` al final                     |
-| `abab`     | Aceptada           | Aceptada        | Alterna `a` y `b`                    |
-| `aabab`    | Aceptada           | Aceptada        | Intermedia mayor                    |
-| `aababab`  | Aceptada           | Aceptada        | Cadena aceptada larga                |
-| `a`        | Rechazada          | Rechazada       | Caso límite 2: cumple inicio, sin `b` final |
-| `b`        | Rechazada          | Rechazada       | Caso límite: termina en `b`, pero no empieza con `a` |
-| `ba`       | Rechazada          | Rechazada       | Empieza con `b`                      |
-| `bb`       | Rechazada          | Rechazada       | Empieza con `b`                      |
-| `aba`      | Rechazada          | Rechazada       | Empieza con `a`, pero termina con `a`|
-| `baba`     | Rechazada          | Rechazada       | Cumple ambos extremos mal            |
+| `ab`       | Aceptada           | Aceptada        | Longitud mínima (intermedia vacía)     |
+| `aab`      | Aceptada           | Aceptada        | Intermedia con `a`                     |
+| `abb`      | Aceptada           | Aceptada        | Dos `b` al final                       |
+| `abab`     | Aceptada           | Aceptada        | Alterna `a` y `b`                      |
+| `aabab`    | Aceptada           | Aceptada        | Intermedia mayor                       |
+| `aababab`  | Aceptada           | Aceptada        | Cadena aceptada larga                  |
+| `a`        | Rechazada          | Rechazada       | Caso límite 1: cumple inicio, sin `b` final |
+| `b`        | Rechazada          | Rechazada       | Caso límite 2: termina en `b`, pero no empieza con `a` |
+| `ba`       | Rechazada          | Rechazada       | Empieza con `b`                        |
+| `bb`       | Rechazada          | Rechazada       | Empieza con `b`                        |
+| `aba`      | Rechazada          | Rechazada       | Empieza con `a`, pero termina con `a`  |
+| `baba`     | Rechazada          | Rechazada       | No empieza con `a` ni termina con `b`  |
 
 > **Resultado:** 6 cadenas aceptadas y 6 rechazadas; todos los resultados de
 > JFLAP coincidieron con lo esperado, incluidos la longitud mínima y los casos
@@ -172,7 +172,7 @@ del patrón `101` se ha visto hasta el momento":
 | `q0`   | No se avanza en el patrón (o se reinició) |
 | `q1`   | Se ha leído un `1` (posible inicio)  |
 | `q2`   | Se ha leído `10`                     |
-| `q3`   | Se encontró `101` → **estado final** (bucle absorvente) |
+| `q3`   | Se encontró `101` → **estado final** (bucle absorbente) |
 
 Archivo **`../P3_AFD.jff`** (4 estados, 8 transiciones, sin λ).
 
@@ -283,7 +283,7 @@ El AFD resume toda la memoria necesaria en 3 preguntas: *¿ya vi una `a`?*,
 | `aabb`   | Aceptada           | Aceptada  | Aceptada  | Aceptada dada                            |
 | `babbb`  | Aceptada           | Aceptada  | Aceptada  | Aceptada dada                            |
 | `ababbb` | Aceptada           | Aceptada  | Aceptada  | Aceptada dada                            |
-| `babb`   | Aceptada           | Aceptada  | Aceptada  | Aceptada dada                            |
+| `babb`   | Aceptada           | Aceptada  | Aceptada  | Aceptada (frontera con el caso límite `bab`) |
 | `bb`     | Rechazada          | Rechazada | Rechazada | Rechazada dada (termina en `bb`, sin `a`)|
 | `aaa`    | Rechazada          | Rechazada | Rechazada | Rechazada dada (con `a`, sin `bb`)       |
 | `aba`    | Rechazada          | Rechazada | Rechazada | Rechazada dada                           |
@@ -292,8 +292,8 @@ El AFD resume toda la memoria necesaria en 3 preguntas: *¿ya vi una `a`?*,
 | `bab`    | Rechazada          | Rechazada | Rechazada | **Caso límite 1:** termina en `b` pero no en `bb`; frontera inmediata con `babb` |
 | `ab`     | Rechazada          | Rechazada | Rechazada | **Caso límite 2:** tiene `a` y termina en `b`, pero le falta un `b` final |
 
-**Resultado:** 5 aceptadas, 5 rechazadas y 2 casos límite, todos consistentes
-entre esperado, AFN y AFD.
+**Resultado:** 5 aceptadas, 5 rechazadas y 2 casos límite (ambos rechazados),
+todos consistentes entre esperado, AFN y AFD.
 
 ### 4.8. Reflexión conceptual (máx. 150 palabras)
 
