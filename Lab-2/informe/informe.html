@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Informe de Laboratorio 2 - Expresiones Regulares con JFLAP</title>
+<style>
+  :root { --azul: #1f4e79; --gris: #444; }
+  @page { size: 210mm 297mm; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", "Segoe UI Symbol", Arial, sans-serif; color: #222; font-size: 10.5pt; line-height: 1.45; }
+
+  .page {
+    width: 210mm; height: 297mm;
+    padding: 17mm 18mm 20mm 18mm;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  .footer {
+    position: absolute; bottom: 8mm; left: 18mm; right: 18mm;
+    border-top: 0.5pt solid #999; padding-top: 2mm;
+    font-size: 8.5pt; color: #666; text-align: center;
+  }
+
+  h1 { font-size: 17pt; color: var(--azul); margin: 0 0 2mm 0; text-align: center; }
+  h2 { font-size: 13.5pt; color: var(--azul); border-bottom: 1pt solid var(--azul); padding-bottom: 1mm; margin: 5mm 0 3mm 0; }
+  h3 { font-size: 11.5pt; color: var(--azul); margin: 4mm 0 2mm 0; }
+  p  { margin: 0 0 2.5mm 0; text-align: justify; }
+  ul { margin: 0 0 2.5mm 0; padding-left: 6mm; }
+  li { margin-bottom: 1mm; }
+
+  .sub { color: var(--gris); font-style: italic; font-size: 10pt; margin: 1mm 0 3mm 0; }
+
+  table { border-collapse: collapse; width: 100%; margin: 2mm 0 3mm 0; font-size: 9.5pt; }
+  th, td { border: 0.6pt solid #666; padding: 1.2mm 1.6mm; text-align: center; }
+  th { background: #dbe7f3; color: var(--azul); }
+  td.izq, th.izq { text-align: left; }
+  tr:nth-child(even) td { background: #f4f7fb; }
+
+  .codigo {
+    font-family: "Consolas", "Courier New", monospace;
+    background: #eef2f7; border: 0.6pt solid #b8c4d4; border-radius: 2pt;
+    padding: 1.5mm 2mm; margin: 1mm 0 3mm 0; font-size: 10pt; display: inline-block;
+  }
+
+  .portada-box { margin-top: 6mm; }
+  .portada-box table { margin-top: 2mm; }
+  .portada-box th { width: 34%; }
+  .centro { text-align: center; }
+
+  .figura {
+    border: 1pt dashed #88a; background: #fafbfc; text-align: center;
+    padding: 4mm 2mm; margin: 3mm 0; color: #667; font-size: 9.5pt;
+    min-height: 58mm; display: flex; flex-direction: column; justify-content: center;
+  }
+  .figura.titulo { background: #eef2f7; font-weight: bold; border: none; margin: 0 0 1.5mm 0; padding: 1.5mm; }
+  .figura .leyenda { margin-top: 2mm; color: #88a; }
+
+  .fila-dos { display: flex; gap: 5mm; }
+  .fila-dos > div { flex: 1; }
+
+  .introduccion { margin-top: 5mm; }
+</style>
+</head>
+<body>
+
+<!-- ==================== PAGINA 1: PORTADA + INTRODUCCION ==================== -->
+<div class="page">
+  <h1>INFORME DE LABORATORIO #2</h1>
+  <h2 style="text-align:center; border:none; margin-top:1mm;">Expresiones Regulares con JFLAP</h2>
+  <p class="sub centro" style="margin-bottom:5mm;">Teoría de la Computación – INFO1148</p>
+
+  <div class="portada-box">
+    <table>
+      <tr><th class="izq">Antecedente</th><th class="izq">Información</th></tr>
+      <tr><td class="izq"><b>Asignatura</b></td><td class="izq">Teoría de la Computación INFO1148</td></tr>
+      <tr><td class="izq"><b>Carrera</b></td><td class="izq">Ingeniería Civil en Informática</td></tr>
+      <tr><td class="izq"><b>Docente</b></td><td class="izq">M. Lévano</td></tr>
+      <tr><td class="izq"><b>Integrantes</b></td><td class="izq">Francisco Benavides Affeld – Marcelo Matamala Núñez</td></tr>
+      <tr><td class="izq"><b>Fecha</b></td><td class="izq">10 de octubre de 2026</td></tr>
+    </table>
+  </div>
+
+  <h2 class="introduccion">1. Introducción</h2>
+  <p>
+    El propósito de este laboratorio es aplicar los conceptos de lenguajes regulares y expresiones
+    regulares mediante la herramienta JFLAP, relacionando una expresión regular con los autómatas
+    finitos que reconocen el mismo lenguaje. Para ello se interpreta una expresión regular dada,
+    se diseñan expresiones propias a partir de restricciones sobre cadenas y se realizan las
+    conversiones Expresión Regular → AFN → AFD, comprobando mediante casos de prueba la equivalencia
+    entre estas tres representaciones de un lenguaje regular y justificando formalmente los
+    resultados observados.
+  </p>
+
+  <div class="footer">Página 1 de 8</div>
+</div>
+
+<!-- ==================== PAGINA 2: PREGUNTA 1 ==================== -->
+<div class="page">
+  <h2>2. Desarrollo</h2>
+  <h3>2.1 Pregunta 1 – Interpretación y validación de una expresión regular</h3>
+
+  <p><b>a) Lenguaje representado</b></p>
+  <p>
+    La expresión regular <span class="codigo">(0+1)*01</span> se compone de dos partes:
+    <b>(0+1)*</b>, que representa cualquier cadena de ceros y unos (incluida la cadena vacía),
+    y <b>01</b>, que exige que la cadena termine con un <b>0</b> seguido de un <b>1</b>.
+    Por lo tanto, la expresión representa el lenguaje de todas las cadenas sobre
+    Σ = {0, 1} que <b>terminan en "01"</b>:
+  </p>
+  <p style="text-align:center;">L = { w ∈ {0,1}* | w termina en 01 }</p>
+
+  <p><b>b) Resultados obtenidos</b></p>
+  <table>
+    <tr><th>Cadena</th><th>Predicción</th><th>Resultado JFLAP</th><th>¿Coinciden?</th></tr>
+    <tr><td>01</td><td>Aceptada</td><td>Aceptada</td><td>Sí</td></tr>
+    <tr><td>101</td><td>Aceptada</td><td>Aceptada</td><td>Sí</td></tr>
+    <tr><td>1101</td><td>Aceptada</td><td>Aceptada</td><td>Sí</td></tr>
+    <tr><td>0001</td><td>Aceptada</td><td>Aceptada</td><td>Sí</td></tr>
+    <tr><td>10</td><td>Rechazada</td><td>Rechazada</td><td>Sí</td></tr>
+    <tr><td>111</td><td>Rechazada</td><td>Rechazada</td><td>Sí</td></tr>
+    <tr><td>0100</td><td>Rechazada</td><td>Rechazada</td><td>Sí</td></tr>
+    <tr><td>10101</td><td>Aceptada</td><td>Aceptada</td><td>Sí</td></tr>
+  </table>
+  <p>
+    Predicciones y resultados de JFLAP coincidieron en las 8 cadenas, lo que valida la
+    interpretación del lenguaje descrito por la expresión regular.
+  </p>
+
+  <p><b>c) Evidencia en JFLAP</b></p>
+  <div class="figura titulo">Figura 1. AFN obtenido en JFLAP</div>
+  <div class="figura">[Insertar captura del AFN de (0+1)*01 – archivo P1_AFN.jff]</div>
+
+  <p><b>d) Análisis</b></p>
+  <p>
+    La cadena <b>1101 es aceptada</b> porque termina en "01": la parte (0+1)* absorbe el prefijo
+    "11" y los dos últimos símbolos cumplen el sufijo 0 seguido de 1, por lo que el AFN finaliza en
+    un estado de aceptación. La cadena <b>0100 es rechazada</b> porque termina en "00": aunque
+    contiene la subcadena "01" al inicio, la expresión no exige que la cadena contenga "01", sino
+    que <i>termine</i> en "01"; al final el símbolo leído es 0 y no 1, quedando el autómata en un
+    estado no final.
+  </p>
+
+  <div class="footer">Página 2 de 8</div>
+</div>
+
+<!-- ==================== PAGINA 3: PREGUNTA 2 ==================== -->
+<div class="page">
+  <h3>2.2 Pregunta 2 – Diseño de una expresión regular</h3>
+
+  <p><b>a) Expresión regular propuesta</b></p>
+  <p>Lenguaje: L₂ = { w ∈ {a,b}* | w comienza con <b>a</b> y termina con <b>b</b> }</p>
+  <p>Expresión regular: <span class="codigo">a(a+b)*b</span></p>
+
+  <p><b>b) Explicación</b></p>
+  <p>
+    El <b>a</b> inicial obliga a que toda cadena válida comience con el símbolo <b>a</b>;
+    <b>(a+b)*</b> permite cualquier secuencia intermedia de símbolos a y b, incluida la cadena
+    vacía; y el <b>b</b> final obliga a que la cadena termine con el símbolo <b>b</b>. Se utiliza
+    "+" para la unión por ser la sintaxis de JFLAP. La cadena intermedia vacía está permitida, por
+    lo que la longitud mínima del lenguaje es <b>ab</b>.
+  </p>
+
+  <p><b>c) Casos de prueba</b></p>
+  <table>
+    <tr><th>Cadena</th><th>Resultado esperado</th><th>Resultado JFLAP</th></tr>
+    <tr><td>ab</td><td>Aceptada</td><td>Aceptada</td></tr>
+    <tr><td>aab</td><td>Aceptada</td><td>Aceptada</td></tr>
+    <tr><td>abb</td><td>Aceptada</td><td>Aceptada</td></tr>
+    <tr><td>abab</td><td>Aceptada</td><td>Aceptada</td></tr>
+    <tr><td>aabab</td><td>Aceptada</td><td>Aceptada</td></tr>
+    <tr><td>aababab</td><td>Aceptada</td><td>Aceptada</td></tr>
+    <tr><td>a</td><td>Rechazada</td><td>Rechazada</td></tr>
+    <tr><td>b</td><td>Rechazada</td><td>Rechazada</td></tr>
+    <tr><td>ba</td><td>Rechazada</td><td>Rechazada</td></tr>
+    <tr><td>bb</td><td>Rechazada</td><td>Rechazada</td></tr>
+    <tr><td>aba</td><td>Rechazada</td><td>Rechazada</td></tr>
+    <tr><td>baba</td><td>Rechazada</td><td>Rechazada</td></tr>
+  </table>
+  <p>
+    Se probaron 6 cadenas aceptadas, 6 rechazadas, la de longitud mínima (ab) y dos casos límite
+    (a, que cumple el inicio pero carece del b final; y b, que termina en b pero no empieza con a).
+    Todos los resultados coincidieron con lo esperado.
+  </p>
+
+  <p><b>d) Evidencia en JFLAP</b></p>
+  <div class="figura titulo">Figura 2. AFN generado</div>
+  <div class="figura">[Insertar captura del AFN de a(a+b)*b – archivo P2_AFN.jff]</div>
+
+  <p><b>e) Análisis</b></p>
+  <p>
+    La expresión regular satisface ambas restricciones de forma independiente: cada parte controla
+    exactamente una condición (inicio, parte intermedia y final), y las pruebas confirman que las
+    cadenas aceptadas son precisamente las que comienzan con a y terminan con b, incluyendo los
+    casos límite de longitud mínima y de un único símbolo.
+  </p>
+
+  <div class="footer">Página 3 de 8</div>
+</div>
+
+<!-- ==================== PAGINA 4: PREGUNTA 3 (a, b, c) ==================== -->
+<div class="page">
+  <h3>2.3 Pregunta 3 – Conversión ER → AFN → AFD</h3>
+
+  <p><b>a) Expresión regular propuesta</b></p>
+  <p>ER = <span class="codigo">(0+1)*101(0+1)*</span></p>
+  <p>
+    Los (0+1)* inicial y final permiten cualquier prefijo y sufijo, de modo que la subcadena "101"
+    puede aparecer en cualquier posición de la cadena, describiendo exactamente el lenguaje de las
+    cadenas que contienen la subcadena 101.
+  </p>
+
+  <p><b>b) Características de los autómatas</b></p>
+  <table>
+    <tr><th class="izq">Característica</th><th>AFN</th><th>AFD</th></tr>
+    <tr><td class="izq">Número de estados</td><td>14</td><td>4</td></tr>
+    <tr><td class="izq">Número de transiciones</td><td>19</td><td>8</td></tr>
+    <tr><td class="izq">Transiciones λ</td><td>Sí (12)</td><td>No (0)</td></tr>
+    <tr><td class="izq">Determinista</td><td>No</td><td>Sí</td></tr>
+  </table>
+  <p>
+    El AFN no es determinista porque posee transiciones λ y admite más de un camino para un mismo
+    símbolo; el AFD, por el contrario, tiene exactamente una transición por estado y símbolo y no
+    posee transiciones λ.
+  </p>
+
+  <p><b>c) Pruebas realizadas</b></p>
+  <table>
+    <tr><th>Cadena</th><th>Resultado AFN</th><th>Resultado AFD</th><th>¿Coinciden?</th></tr>
+    <tr><td>101</td><td>Aceptada</td><td>Aceptada</td><td>Sí</td></tr>
+    <tr><td>0101</td><td>Aceptada</td><td>Aceptada</td><td>Sí</td></tr>
+    <tr><td>1010</td><td>Aceptada</td><td>Aceptada</td><td>Sí</td></tr>
+    <tr><td>11011</td><td>Aceptada</td><td>Aceptada</td><td>Sí</td></tr>
+    <tr><td>000</td><td>Rechazada</td><td>Rechazada</td><td>Sí</td></tr>
+    <tr><td>111</td><td>Rechazada</td><td>Rechazada</td><td>Sí</td></tr>
+    <tr><td>1001</td><td>Rechazada</td><td>Rechazada</td><td>Sí</td></tr>
+    <tr><td>1101010</td><td>Aceptada</td><td>Aceptada</td><td>Sí</td></tr>
+  </table>
+
+  <div class="footer">Página 4 de 8</div>
+</div>
+
+<!-- ==================== PAGINA 5: PREGUNTA 3 (d, e) + PREGUNTA 4 (a, b) ==================== -->
+<div class="page">
+  <p><b>d) Evidencias</b></p>
+
+  <div class="fila-dos">
+    <div>
+      <div class="figura titulo">Figura 3. AFN generado</div>
+      <div class="figura" style="min-height:70mm;">[Insertar captura del AFN de (0+1)*101(0+1)* – archivo P3_AFN.jff]</div>
+    </div>
+    <div>
+      <div class="figura titulo">Figura 4. AFD generado</div>
+      <div class="figura" style="min-height:70mm;">[Insertar captura del AFD – archivo P3_AFD.jff]</div>
+    </div>
+  </div>
+
+  <p><b>e) Análisis</b></p>
+  <p>
+    El AFN y el AFD <b>reconocen exactamente el mismo lenguaje</b>. El AFD se obtuvo a partir del
+    AFN mediante la conversión por subconjuntos, que por construcción preserva el lenguaje: cada
+    estado del AFD representa un conjunto de estados del AFN alcanzables al leer el mismo prefijo.
+    Esto se confirma empíricamente: en las 8 cadenas probadas ambos autómatas entregaron resultados
+    idénticos, y una verificación exhaustiva sobre todas las cadenas de longitud ≤ 7 no encontró
+    ninguna cadena aceptada por uno y rechazada por el otro. Las diferencias entre ambos son de
+    representación (no determinismo y transiciones λ frente a determinismo), no de poder de
+    reconocimiento.
+  </p>
+
+  <h3>2.4 Pregunta 4 – Diseño y validación</h3>
+
+  <p><b>a) Expresión regular propuesta</b></p>
+  <p>ER = <span class="codigo">(a+b)*a(a+b)*bb</span></p>
+
+  <p><b>b) Justificación</b></p>
+  <p>
+    La parte <b>(a+b)*a(a+b)*</b> es la forma clásica de describir "contiene al menos una a": el
+    símbolo a aparece obligatoriamente en algún punto, con libre tránsito de a y b antes y después
+    de él. El <b>bb</b> final obliga a que los dos últimos símbolos de la cadena sean b, b. Ambas
+    condiciones no se interfieren porque la a nunca puede formar parte del bb final: toda cadena del
+    lenguaje se descompone como u·bb, donde u contiene al menos una a, y recíprocamente cualquier
+    u·bb con a en u cumple ambas condiciones.
+  </p>
+
+  <div class="footer">Página 5 de 8</div>
+</div>
+
+<!-- ==================== PAGINA 6: PREGUNTA 4 (c, d, e) ==================== -->
+<div class="page">
+  <p><b>c) Casos de prueba</b></p>
+  <table>
+    <tr><th>Cadena</th><th>Resultado esperado</th><th>AFN</th><th>AFD</th></tr>
+    <tr><td>abb</td><td>Aceptada</td><td>Aceptada</td><td>Aceptada</td></tr>
+    <tr><td>aabb</td><td>Aceptada</td><td>Aceptada</td><td>Aceptada</td></tr>
+    <tr><td>babbb</td><td>Aceptada</td><td>Aceptada</td><td>Aceptada</td></tr>
+    <tr><td>ababbb</td><td>Aceptada</td><td>Aceptada</td><td>Aceptada</td></tr>
+    <tr><td>babb</td><td>Aceptada</td><td>Aceptada</td><td>Aceptada</td></tr>
+    <tr><td>bb</td><td>Rechazada</td><td>Rechazada</td><td>Rechazada</td></tr>
+    <tr><td>aaa</td><td>Rechazada</td><td>Rechazada</td><td>Rechazada</td></tr>
+    <tr><td>aba</td><td>Rechazada</td><td>Rechazada</td><td>Rechazada</td></tr>
+    <tr><td>baba</td><td>Rechazada</td><td>Rechazada</td><td>Rechazada</td></tr>
+    <tr><td>abab</td><td>Rechazada</td><td>Rechazada</td><td>Rechazada</td></tr>
+    <tr><td>bab</td><td>Rechazada</td><td>Rechazada</td><td>Rechazada</td></tr>
+    <tr><td>ab</td><td>Rechazada</td><td>Rechazada</td><td>Rechazada</td></tr>
+  </table>
+  <p>
+    Se probaron las 4 aceptadas y 4 rechazadas indicadas en el enunciado, además de la aceptada
+    <b>babb</b> y los casos límite <b>bab</b> (termina en un solo b, frontera inmediata con babb) y
+    <b>ab</b> (tiene a y termina en b, pero carece del segundo b). Los resultados coinciden entre
+    esperado, AFN y AFD.
+  </p>
+
+  <p><b>d) Evidencias</b></p>
+  <div class="figura titulo">Figura 5. Expresión regular en JFLAP</div>
+  <div class="figura" style="min-height:26mm;">[Insertar captura de la ER (a+b)*a(a+b)*bb ingresada en JFLAP]</div>
+
+  <div class="fila-dos">
+    <div>
+      <div class="figura titulo">Figura 6. AFN generado</div>
+      <div class="figura" style="min-height:34mm;">[Insertar captura del AFN – archivo P4_AFN.jff]</div>
+    </div>
+    <div>
+      <div class="figura titulo">Figura 7. AFD generado</div>
+      <div class="figura" style="min-height:34mm;">[Insertar captura del AFD – archivo P4_AFD.jff]</div>
+    </div>
+  </div>
+
+  <div class="footer">Página 6 de 8</div>
+</div>
+
+<!-- ==================== PAGINA 7: PREGUNTA 4 (e) REFLEXION ==================== -->
+<div class="page">
+  <h3>2.4 Pregunta 4 – Diseño y validación</h3>
+
+  <p><b>e) Reflexión</b></p>
+  <p>
+    Expresión Regular, AFN y AFD <b>no poseen distinta capacidad de reconocimiento</b>: son tres
+    formas de representar la misma clase de lenguajes, los lenguajes regulares. El teorema de
+    Kleene garantiza que un lenguaje es regular si y solo si existe una ER, un AFN y un AFD que lo
+    reconocen. En la práctica difieren en su uso, no en su poder: la ER es una notación declarativa
+    y compacta; el AFN, al admitir transiciones λ y no determinismo, suele construirse con menos
+    estados; y el AFD elimina la ambigüedad, de modo que toda cadena tiene un único recorrido, lo
+    que simplifica su implementación mecánica. En este laboratorio, las tres representaciones
+    aceptaron y rechazaron exactamente las mismas cadenas en todas las pruebas, confirmando que
+    solo cambia la forma de describir el mismo lenguaje.
+  </p>
+
+  <div class="footer">Página 7 de 8</div>
+</div>
+
+<!-- ==================== PAGINA 8: CONCLUSIONES + ARCHIVOS ==================== -->
+<div class="page">
+  <h2>3. Conclusiones</h2>
+  <p>
+    El laboratorio permitió relacionar de forma práctica las tres representaciones de un lenguaje
+    regular: la expresión regular como notación declarativa, el AFN como resultado directo de la
+    conversión de la expresión y el AFD como versión determinista equivalente. Se observó que la
+    conversión introdujo transiciones λ y no determinismo en los AFN, mientras que los AFD
+    resultantes eliminaron la ambigüedad conservando exactamente el lenguaje, lo que confirmó, junto
+    con las tablas de pruebas, la equivalencia entre ER, AFN y AFD.
+  </p>
+  <p>
+    JFLAP demostró ser una herramienta útil para diseñar, convertir y validar autómatas: permitió
+    verificar rápidamente la aceptación o rechazo de cada cadena y comprobar que las predicciones
+    teóricas coincidían con los resultados simulados. Además, se reforzó la comprensión de cómo
+    traducir restricciones sobre cadenas (inicio, final, presencia de subcadenas) a expresiones
+    regulares correctas y a autómatas equivalentes.
+  </p>
+
+  <h2>4. Archivos adjuntos</h2>
+  <p>Archivos .jff entregados junto con el informe:</p>
+  <ul>
+    <li>P1_AFN.jff – AFN de (0+1)*01 (Pregunta 1)</li>
+    <li>P2_AFN.jff – AFN de a(a+b)*b (Pregunta 2)</li>
+    <li>P3_AFN.jff – AFN de (0+1)*101(0+1)* (Pregunta 3)</li>
+    <li>P3_AFD.jff – AFD equivalente del AFN de la Pregunta 3</li>
+    <li>P4_AFN.jff – AFN de (a+b)*a(a+b)*bb (Pregunta 4)</li>
+    <li>P4_AFD.jff – AFD equivalente del AFN de la Pregunta 4</li>
+  </ul>
+  <p>
+    Enlace al repositorio (GitHub):
+    <span class="codigo">https://github.com/franciscobenavides876/Teoria-Laboratorios/tree/Laboratorio-2/Lab-2</span>
+  </p>
+
+  <div class="footer">Página 8 de 8</div>
+</div>
+
+</body>
+</html>
