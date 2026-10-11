@@ -7,7 +7,10 @@
 **Modalidad:** Trabajo práctico de laboratorio de parejas
 
 Esta carpeta (`Lab-2/`) es el área de trabajo del laboratorio. Aquí se guardan los
-archivos `.jff` generados en JFLAP, las capturas y el informe final.
+archivos `.jff` generados en JFLAP y las capturas de JFLAP.
+
+> **Nota:** el informe (PDF) se entrega por la vía indicada por el profesor y
+> no reside en este repositorio.
 
 ## Estructura
 
@@ -20,8 +23,7 @@ Lab-2/
 ├── P3_AFN.jff             ← Pregunta 3: AFN de L₃ (contiene la subcadena 101)
 ├── P3_AFD.jff             ← Pregunta 3: AFD obtenido del AFN
 ├── P4_AFN.jff             ← Pregunta 4: AFN (al menos una a y termina en bb)
-├── P4_AFD.jff             ← Pregunta 4: AFD obtenido del AFN
-└── Lab02_jefe_nombre_apellido.pdf   ← informe final
+└── P4_AFD.jff             ← Pregunta 4: AFD obtenido del AFN
 ```
 
 ## Entrega
@@ -78,8 +80,8 @@ Lab-2/
 - [x] P3: ER + AFN + AFD + tabla de características + 8 pruebas ✅ (pendiente: capturas JFLAP)
 - [x] P4: ER + AFN + AFD + 12 pruebas + reflexión ✅ (pendiente: capturas JFLAP)
 - [x] Archivos `.jff` con los nombres indicados ✅ (generados y validados por `generar_jff.py`)
-- [ ] Informe PDF `Lab02_jefe_nombre_apellido.pdf`
-- [ ] Enlace en anexos con acceso habilitado
+- [x] Capturas de JFLAP ✅ (en `capturas/`)
+- [ ] Enlace en anexos con acceso habilitado (va en el informe, no en el repo)
 
 ## Estado actual del área de trabajo
 
@@ -93,14 +95,11 @@ Lab-2/
 ├── P3_AFD.jff             ← Pregunta 3: AFD equivalente            (4 est., 8 trans.)
 ├── P4_AFN.jff             ← Pregunta 4: AFN (≥1 a y termina bb)    (14 est., 19 trans., 12 λ)
 ├── P4_AFD.jff             ← Pregunta 4: AFD equivalente            (4 est., 8 trans.)
-├── capturas/              ← capturas de JFLAP (P1_AFN, P2_AFN, P3_AFN, P3_AFD, P4_ER, P4_AFN, P4_AFD)
-└── informe/
-    └── Lab02_informe.md   ← borrador completo del informe (tablas y explicaciones listas)
+└── capturas/              ← capturas de JFLAP (P1_AFN, P2_AFN, P3_AFN, P3_AFD, P4_ER, P4_AFN, P4_AFD)
 ```
 
 **Pendientes antes de entregar:**
 1. Abrir cada `.jff` en JFLAP, ejecutar las cadenas de las tablas y confirmar
    los resultados (deben coincidir con lo validado).
-2. Adjuntar las capturas legibles en `capturas/` y referenciarlas en el informe.
-3. Completar nombres de la pareja, enlace del anexo y exportar
-   `Lab02_informe.md` a PDF con el nombre indicado.
+2. Las capturas de `capturas/` se referencian en el informe PDF, que se
+   entrega por la vía indicada por el profesor (no reside en el repositorio).
