@@ -79,7 +79,7 @@ Lab-2/
 - [x] P2: ER diseñada + justificación + AFN + 12 pruebas ✅ (pendiente: captura JFLAP)
 - [x] P3: ER + AFN + AFD + tabla de características + 8 pruebas ✅ (pendiente: capturas JFLAP)
 - [x] P4: ER + AFN + AFD + 12 pruebas + reflexión ✅ (pendiente: capturas JFLAP)
-- [x] Archivos `.jff` con los nombres indicados ✅ (generados y validados por `generar_jff.py`)
+- [x] Archivos `.jff` con los nombres indicados ✅ (abren correctamente en JFLAP)
 - [x] Capturas de JFLAP ✅ (en `capturas/`)
 - [ ] Enlace en anexos con acceso habilitado (va en el informe, no en el repo)
 
@@ -88,7 +88,6 @@ Lab-2/
 ```
 Lab-2/
 ├── README.md              ← este archivo (plan de trabajo)
-├── generar_jff.py         ← genera y valida los archivos .jff (verificación exhaustiva)
 ├── P1_AFN.jff             ← Pregunta 1: AFN de (0+1)*01            (8 est., 10 trans., 6 λ)
 ├── P2_AFN.jff             ← Pregunta 2: AFN de L₂ = a(a+b)*b       (8 est., 10 trans., 6 λ)
 ├── P3_AFN.jff             ← Pregunta 3: AFN de L₃ contiene "101"   (14 est., 19 trans., 12 λ)
