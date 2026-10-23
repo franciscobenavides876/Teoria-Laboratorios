@@ -3,7 +3,7 @@
 **Asignatura:** Teoría de la Computación — INFO1148
 **Tema:** Gramáticas Libres de Contexto (GLC)
 **Modalidad:** Laboratorio práctico (parejas)
-**Integrantes:** Francisco Benavides · _(integrante 2: completar)_
+**Integrantes:** Francisco Benavides · Marcelo Matamala
 **Docente:** Prof. M. Lévano
 **Puntaje:** 100 puntos
 

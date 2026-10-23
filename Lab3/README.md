@@ -12,7 +12,7 @@ extensión creativa y las evidencias de ejecución del Laboratorio 3.
 | Integrante | |
 |---|---|
 | Francisco Benavides | `franciscobenavides876` |
-| _(integrante 2)_ | completar antes de entregar |
+| Marcelo Matamala | — |
 
 ## Estructura
 
@@ -107,6 +107,6 @@ Opción B: extensión *Markdown PDF* de VS Code sobre `Laboratorio_3_Informe.md`
 - [x] Evidencia ejecutable (`gramatica.py` → `Fallos: 0`)
 - [x] Captura del árbol de derivación (PNG) + archivos `.dot`/`.mmd`
 - [x] Informe exportado a PDF (13 páginas) en `informe/Laboratorio_3_Informe.pdf`
-- [ ] Completar el nombre del segundo integrante en el informe y en este README
+- [x] Integrantes completos: Francisco Benavides y Marcelo Matamala
 - [ ] Renombrar el PDF según la convención del profesor y subirlo por la vía indicada
 - [ ] Confirmar con el profesor si desea el árbol en JFLAP además del `.dot`/`.mmd`
