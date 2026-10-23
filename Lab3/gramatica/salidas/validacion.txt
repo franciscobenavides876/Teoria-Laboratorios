@@ -1,0 +1,99 @@
+==============================================================================
+PREGUNTA 2 - Programa de referencia completo
+==============================================================================
+Resultado: ACEPTADO - Cadena valida
+
+Instrucciones reconocidas en el programa de referencia:
+  - asignaciones simples      : 6
+  - asignaciones aritmeticas  : 7
+  - instrucciones de salida   : 7
+  - comentarios               : 1
+  - total de elementos        : 21
+(arbol completo exportado en salidas/arbol_programa_referencia.dot)
+
+==============================================================================
+PREGUNTA 4 - Validacion de cadenas
+==============================================================================
+Caso  Cadena                        Esperado   Obtenido   Estado
+1     x = 10 #                      VALIDA     VALIDA     OK
+      Analisis: Cadena valida
+      Justificacion: Asignacion simple: identificador, '=', numero y terminador.
+2     z = x + y #                   VALIDA     VALIDA     OK
+      Analisis: Cadena valida
+      Justificacion: Asignacion aritmetica: operando, operador '+' y expresion.
+3     salida z #                    VALIDA     VALIDA     OK
+      Analisis: Cadena valida
+      Justificacion: Instruccion de salida completa.
+4     x 10 #                        INVALIDA   INVALIDA   OK
+      Analisis: se encontro NUM '10' (token NUM '10', linea 1, columna 3); se esperaba: =
+      Justificacion: Falta el operador de asignacion '=' entre el identificador y el numero.
+5     z = + x y #                   INVALIDA   INVALIDA   OK
+      Analisis: se encontro OP_ARIT '+' (token OP_ARIT '+', linea 1, columna 5); se esperaba: ID, NUM
+      Justificacion: El operador '+' esta en posicion inicial (falta el operando de la izquierda) y falta un operador entre 'x' e 'y'.
+6     salida #                      INVALIDA   INVALIDA   OK
+      Analisis: se encontro HASH '#' (token HASH '#', linea 1, columna 8); se esperaba: identificador
+      Justificacion: Falta el identificador que se desea imprimir antes del '#'.
+7     x = 20                        INVALIDA   INVALIDA   OK
+      Analisis: se encontro EOF '<fin de entrada>' (token EOF '<fin de entrada>', linea 1, columna 7); se esperaba: #
+      Justificacion: Falta el terminador de instruccion '#'.
+8     Begin Programa prueba x =...  VALIDA     VALIDA     OK
+      Cadena completa (los saltos de linea se muestran como ' / '):
+      Begin / Programa prueba / x = 5 # / salida x # / End
+      Analisis: Cadena valida
+      Justificacion: Programa completo: Begin Programa <id> <instrucciones> End.
+
+==============================================================================
+EXTENSION CREATIVA (opcion A) - condicional si ... entonces ... fin_si
+==============================================================================
+Cadena   : si x > 10 entonces y = x + 1 # fin_si
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Condicional valido: condicion con operador relacional y bloque de instrucciones.
+
+Cadena   : si x > 10 entonces y = x + 1 #
+Esperado : INVALIDA
+Obtenido : INVALIDA - se encontro EOF '<fin de entrada>' (token EOF '<fin de entrada>', linea 1, columna 31); se esperaba: fin_si
+Motivo   : Falta el cierre 'fin_si' del condicional.
+
+Cadena   : si entonces y = 1 # fin_si
+Esperado : INVALIDA
+Obtenido : INVALIDA - se encontro ENTONCES 'entonces' (token ENTONCES 'entonces', linea 1, columna 4); se esperaba: ID, NUM
+Motivo   : Falta la condicion entre 'si' y 'entonces'.
+
+Cadena   : si x >= 10 entonces salida x # fin_si
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Condicional con operador relacional de dos caracteres y salida interna.
+
+
+==============================================================================
+PREGUNTA 3 - Arbol de derivacion de 'z = x + y #'
+==============================================================================
+Resultado: ACEPTADO - Cadena valida
+
+<instruccion>
+└── <asignacion>
+    └── <asignacion_aritmetica>
+        ├── <identificador>
+        │   └── z
+        ├── =
+        ├── <expresion_aritmetica>
+        │   ├── <operando>
+        │   │   └── <identificador>
+        │   │       └── x
+        │   ├── <operador_aritmetico>
+        │   │   └── +
+        │   └── <expresion>
+        │       ├── <termino>
+        │       │   ├── <factor>
+        │       │   │   └── <operando>
+        │       │   │       └── <identificador>
+        │       │   │           └── y
+        │       │   └── <resto_termino>
+        │       │       └── ε
+        │       └── <resto_expresion>
+        │           └── ε
+        └── #
+
+Fronda (hojas de izquierda a derecha): z = x + y #
+

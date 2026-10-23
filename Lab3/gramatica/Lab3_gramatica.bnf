@@ -1,0 +1,76 @@
+(* =====================================================================
+   Laboratorio 3 - Diseno y Validacion de Gramaticas  (INFO1148)
+   Gramatica libre de contexto  G = (V, Sigma, P, S)
+
+   Notacion: BNF, una produccion por linea, numeradas para poder
+   referenciarlas en las derivaciones del informe.
+   epsilon = produccion vacia (cadena vacia).
+   ID, NUM y COMENT son clases lexicas (ver Anexo A del informe).
+
+   P1 - P33  : nucleo del lenguaje solicitado.
+   P34 - P41 : extension creativa (Opcion A: condicional).
+   ===================================================================== *)
+
+(* ---------- Estructura del programa ---------------------------------- *)
+<programa>              ::= Begin Programa <identificador> <lista_instrucciones> End   (* P1  *)
+
+<lista_instrucciones>   ::= <instruccion>                                               (* P2  *)
+                          | <instruccion> <lista_instrucciones>                         (* P3  *)
+                          | <comentario> <lista_instrucciones>                          (* P4  *)
+
+<instruccion>           ::= <asignacion>                                                (* P5  *)
+                          | <salida>                                                    (* P6  *)
+                          | <condicional>                                               (* P7  *)
+
+(* ---------- Asignacion ------------------------------------------------ *)
+<asignacion>            ::= <asignacion_simple>                                         (* P8  *)
+                          | <asignacion_aritmetica>                                     (* P9  *)
+
+<asignacion_simple>     ::= <identificador> = <operando> #                              (* P10 *)
+
+<asignacion_aritmetica> ::= <identificador> = <expresion_aritmetica> #                  (* P11 *)
+
+(* ---------- Expresiones aritmeticas ----------------------------------- *)
+<expresion_aritmetica>  ::= <operando> <operador_aritmetico> <expresion>                (* P12 *)
+
+<expresion>             ::= <termino> <resto_expresion>                                  (* P13 *)
+<resto_expresion>       ::= + <termino> <resto_expresion>                                (* P14 *)
+                          | - <termino> <resto_expresion>                                (* P15 *)
+                          | epsilon                                                      (* P16 *)
+
+<termino>               ::= <factor> <resto_termino>                                     (* P17 *)
+<resto_termino>         ::= * <factor> <resto_termino>                                   (* P18 *)
+                          | / <factor> <resto_termino>                                   (* P19 *)
+                          | % <factor> <resto_termino>                                   (* P20 *)
+                          | epsilon                                                      (* P21 *)
+
+<factor>                ::= <operando>                                                   (* P22 *)
+
+<operando>              ::= <identificador>                                              (* P23 *)
+                          | <numero>                                                     (* P24 *)
+
+<operador_aritmetico>   ::= +                                                            (* P25 *)
+                          | -                                                            (* P26 *)
+                          | *                                                            (* P27 *)
+                          | /                                                            (* P28 *)
+                          | %                                                            (* P29 *)
+
+(* ---------- Salida ---------------------------------------------------- *)
+<salida>                ::= salida <identificador> #                                     (* P30 *)
+
+(* ---------- Nivel lexico (clases de token) --------------------------- *)
+<identificador>         ::= ID                                                           (* P31 *)
+<numero>                ::= NUM                                                          (* P32 *)
+<comentario>            ::= COMENT                                                       (* P33 *)
+
+(* ---------- Extension creativa: condicional (Opcion A) ---------------- *)
+<condicional>           ::= si <condicion> entonces <lista_instrucciones> fin_si        (* P34 *)
+
+<condicion>             ::= <expresion> <operador_relacional> <expresion>                (* P35 *)
+
+<operador_relacional>   ::= <                                                            (* P36 *)
+                          | >                                                            (* P37 *)
+                          | <=                                                           (* P38 *)
+                          | >=                                                           (* P39 *)
+                          | ==                                                           (* P40 *)
+                          | !=                                                           (* P41 *)

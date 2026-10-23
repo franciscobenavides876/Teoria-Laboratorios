@@ -1,0 +1,46 @@
+graph TD
+  n0["#lt;instruccion#gt;"]
+  n1["#lt;asignacion#gt;"]
+  n2["#lt;asignacion_aritmetica#gt;"]
+  n3["#lt;identificador#gt;"]
+  n4["z"]
+  n5["="]
+  n6["#lt;expresion_aritmetica#gt;"]
+  n7["#lt;operando#gt;"]
+  n8["#lt;identificador#gt;"]
+  n9["x"]
+  n10["#lt;operador_aritmetico#gt;"]
+  n11["+"]
+  n12["#lt;expresion#gt;"]
+  n13["#lt;termino#gt;"]
+  n14["#lt;factor#gt;"]
+  n15["#lt;operando#gt;"]
+  n16["#lt;identificador#gt;"]
+  n17["y"]
+  n18["#lt;resto_termino#gt;"]
+  n19["ε"]
+  n20["#lt;resto_expresion#gt;"]
+  n21["ε"]
+  n22["#35;"]
+  n3 --> n4
+  n2 --> n3
+  n2 --> n5
+  n8 --> n9
+  n7 --> n8
+  n6 --> n7
+  n10 --> n11
+  n6 --> n10
+  n16 --> n17
+  n15 --> n16
+  n14 --> n15
+  n13 --> n14
+  n18 --> n19
+  n13 --> n18
+  n12 --> n13
+  n20 --> n21
+  n12 --> n20
+  n6 --> n12
+  n2 --> n6
+  n2 --> n22
+  n1 --> n2
+  n0 --> n1
