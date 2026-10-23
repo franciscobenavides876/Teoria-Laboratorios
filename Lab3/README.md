@@ -20,8 +20,9 @@ extensión creativa y las evidencias de ejecución del Laboratorio 3.
 Lab3/
 ├── README.md                         ← este archivo (guía de la carpeta)
 ├── informe/
+│   ├── Laboratorio_3_Informe.pdf     ← ENTREGABLE (13 páginas, PDF)
 │   ├── Laboratorio_3_Informe.md      ← informe completo (fuente)
-│   ├── Laboratorio_3_Informe.html    ← versión imprimible (Ctrl+P → PDF)
+│   ├── Laboratorio_3_Informe.html    ← versión imprimible (origen del PDF)
 │   └── build_html.py                 ← regenera el HTML desde el Markdown
 └── gramatica/
     ├── Lab3_gramatica.bnf            ← gramática G = (V, Σ, P, S) en BNF, 41 producciones
@@ -31,6 +32,7 @@ Lab3/
         ├── arbol_z_igual_x_mas_y.txt         (P3: árbol en texto)
         ├── arbol_z_igual_x_mas_y.dot         (P3: árbol en Graphviz)
         ├── arbol_z_igual_x_mas_y.mmd         (P3: árbol en Mermaid)
+        ├── arbol_z_igual_x_mas_y.png         (P3: captura del árbol)
         └── arbol_programa_referencia.dot     (P2: árbol del programa completo)
 ```
 
@@ -71,10 +73,11 @@ python Lab3/informe/build_html.py      # requiere: pip install markdown-it-py
 Luego abrir `Lab3/informe/Laboratorio_3_Informe.html` en un navegador y usar
 **Imprimir → Guardar como PDF** (A4, márgenes predeterminados, activar «Gráficos de fondo»).
 Los diagramas Mermaid se dibujan al abrir el archivo (necesita Internet); el árbol también está
-en texto por si no hay conexión.
+en texto y como captura PNG por si no hay conexión.
 
 Opción B: extensión *Markdown PDF* de VS Code sobre `Laboratorio_3_Informe.md`.
 
+> El PDF ya está generado (`informe/Laboratorio_3_Informe.pdf`, 13 páginas).
 > El PDF final se entrega por la vía indicada por el profesor, con la nomenclatura que él
 > solicite; esta carpeta guarda la fuente y la evidencia.
 
@@ -102,6 +105,8 @@ Opción B: extensión *Markdown PDF* de VS Code sobre `Laboratorio_3_Informe.md`
 - [x] P4: tabla de los 8 casos + análisis de errores
 - [x] Extensión creativa (Opción A) formalizada y validada
 - [x] Evidencia ejecutable (`gramatica.py` → `Fallos: 0`)
+- [x] Captura del árbol de derivación (PNG) + archivos `.dot`/`.mmd`
+- [x] Informe exportado a PDF (13 páginas) en `informe/Laboratorio_3_Informe.pdf`
 - [ ] Completar el nombre del segundo integrante en el informe y en este README
-- [ ] Exportar el informe a PDF y subirlo por la vía indicada por el profesor
+- [ ] Renombrar el PDF según la convención del profesor y subirlo por la vía indicada
 - [ ] Confirmar con el profesor si desea el árbol en JFLAP además del `.dot`/`.mmd`

@@ -15,6 +15,7 @@
 | Validador (léxico + sintáctico) | [`gramatica/gramatica.py`](../gramatica/gramatica.py) |
 | Evidencia de validación | [`gramatica/salidas/validacion.txt`](../gramatica/salidas/validacion.txt) |
 | Árbol de `z = x + y #` | [`gramatica/salidas/arbol_z_igual_x_mas_y.txt`](../gramatica/salidas/arbol_z_igual_x_mas_y.txt) · [`.dot`](../gramatica/salidas/arbol_z_igual_x_mas_y.dot) · [`.mmd`](../gramatica/salidas/arbol_z_igual_x_mas_y.mmd) |
+| Captura del árbol (PNG) | [`gramatica/salidas/arbol_z_igual_x_mas_y.png`](../gramatica/salidas/arbol_z_igual_x_mas_y.png) |
 
 ---
 
@@ -489,6 +490,11 @@ graph TD
         └── #
 ```
 
+**Captura renderizada** (evidencia gráfica; también en
+[`../gramatica/salidas/arbol_z_igual_x_mas_y.png`](../gramatica/salidas/arbol_z_igual_x_mas_y.png)):
+
+![Árbol de derivación de z = x + y #](../gramatica/salidas/arbol_z_igual_x_mas_y.png)
+
 ### 5.5 Relación entre raíz, no terminales, terminales y hojas
 
 - **Raíz:** es el símbolo inicial de la derivación, `<instruccion>` en este caso. Si el árbol se construye dentro
@@ -859,6 +865,7 @@ python Lab3/gramatica/gramatica.py --check
 | `gramatica/salidas/arbol_z_igual_x_mas_y.txt` | Árbol de `z = x + y #` en texto. |
 | `gramatica/salidas/arbol_z_igual_x_mas_y.dot` | Árbol en formato Graphviz (renderizable con `dot -Tpng`). |
 | `gramatica/salidas/arbol_z_igual_x_mas_y.mmd` | Árbol en Mermaid. |
+| `gramatica/salidas/arbol_z_igual_x_mas_y.png` | Captura renderizada del árbol (evidencia gráfica). |
 | `gramatica/salidas/arbol_programa_referencia.dot` | Árbol del programa de referencia completo. |
 
 Requisitos: Python 3.9 o superior, sin dependencias externas (solo biblioteca estándar).
