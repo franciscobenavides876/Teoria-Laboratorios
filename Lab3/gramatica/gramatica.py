@@ -41,7 +41,8 @@ SIMBOLOS = {"=": "ASIG", "#": "HASH"}
 
 @dataclass
 class Token:
-    tipo: str          # ID, NUM, BEGIN, END, PROGRAMA, SALIDA, OP_ARIT, OP_REL, ASIG, HASH, COMENT
+    tipo: str          # ID, NUM, BEGIN, END, PROGRAMA, SALIDA, SI, ENTONCES, FIN_SI,
+                       # OP_ARIT, OP_REL, ASIG, HASH, COMENT
     lexema: str
     linea: int
     columna: int
@@ -125,13 +126,8 @@ def tokenizar(texto: str) -> list[Token]:
             tokens.append(Token("NUM", texto[inicio:i], li, co))
             continue
 
-        # simbolos de un caracter
-        if c in SIMBOLOS:
-            tokens.append(Token(SIMBOLOS[c], c, linea, col))
-            avanzar()
-            continue
-
-        # operadores (maximo munch)
+        # operadores (maximo munch). Se comprueban antes que los simbolos
+        # de un caracter para que '==' sea OP_REL y no dos ASIG.
         for op in OPERADORES:
             if texto.startswith(op, i):
                 tipo = "OP_REL" if op in {"<", ">", "<=", ">=", "==", "!="} else "OP_ARIT"
@@ -139,6 +135,11 @@ def tokenizar(texto: str) -> list[Token]:
                 avanzar(len(op))
                 break
         else:
+            # simbolos de un caracter
+            if c in SIMBOLOS:
+                tokens.append(Token(SIMBOLOS[c], c, linea, col))
+                avanzar()
+                continue
             raise ErrorLexico(f"caracter no permitido {c!r}", linea, col)
 
     tokens.append(Token("EOF", "<fin de entrada>", linea, col))
@@ -198,6 +199,16 @@ class Parser:
         self.pos += 1
         return tok
 
+    def consumir_operador(self, permitidos: set[str]) -> Token:
+        """Consume un OP_ARIT cuyo lexema este en `permitidos`."""
+        tok = self.actual
+        if tok.tipo != "OP_ARIT" or tok.lexema not in permitidos:
+            raise ErrorSintactico(
+                f"se encontro {tok.tipo} {tok.lexema!r}", tok, sorted(permitidos)
+            )
+        self.pos += 1
+        return tok
+
     def terminal(self, tipo: str, esperado: list[str] | None = None) -> Nodo:
         tok = self.consumir(tipo, esperado)
         return Nodo(tok.lexema, terminal=True)
@@ -248,10 +259,10 @@ class Parser:
             )
         return nodo
 
-    # <asignacion> -> <asignacion_simple> | <asignacion_aritmetica>
+    # <asignacion> -> <asignacion_simple> | <asignacion_aritmetica>         (P8, P9)
     def asignacion(self) -> Nodo:
         nodo = Nodo("<asignacion>")
-        # La decision se toma mirando el token que sigue al '='.
+        # La decision se toma mirando si el lado derecho tiene operadores.
         if not self.es_asignacion_aritmetica():
             nodo.agregar(self.asignacion_simple())
         else:
@@ -259,12 +270,23 @@ class Parser:
         return nodo
 
     def es_asignacion_aritmetica(self) -> bool:
-        """True si tras '<id> =' viene '<operando> <operador_aritmetico>'."""
+        """True si entre '=' y '#' aparece al menos un operador aritmetico.
+
+        Es la condicion que separa P10 (asignacion simple) de P11
+        (asignacion con expresion): si el lado derecho es un unico
+        operando se usa la via simple; si contiene cualquier operador
+        (+ - * / %) se usa la via aritmetica.
+        """
         if self.mirar(1).tipo != "ASIG":
             return False
-        if self.mirar(2).tipo not in {"ID", "NUM"}:
-            return False
-        return self.mirar(3).tipo == "OP_ARIT"
+        k = 2
+        while True:
+            tok = self.mirar(k)
+            if tok.tipo in {"HASH", "EOF", "OP_REL"}:
+                return False
+            if tok.tipo == "OP_ARIT":
+                return True
+            k += 1
 
     # <asignacion_simple> -> <identificador> = <operando> #
     def asignacion_simple(self) -> Nodo:
@@ -284,24 +306,77 @@ class Parser:
         nodo.agregar(self.terminal("HASH", ["#"]))
         return nodo
 
-    # <expresion_aritmetica> -> <operando> <operador_aritmetico> <expresion>
+    # <expresion_aritmetica> -> <termino> <resto_expresion_aritmetica>      (P12)
+    #                        | <termino_aritmetico>                         (P13)
+    #
+    # Ambas alternativas obligan a que la expresion contenga al menos un
+    # operador (para no solaparse con <asignacion_simple>), pero respetan
+    # la precedencia: si hay '+' o '-' de nivel superior se usa la primera;
+    # si solo hay '*' '/' '%' se usa <termino_aritmetico>.
     def expresion_aritmetica(self) -> Nodo:
         nodo = Nodo("<expresion_aritmetica>")
-        nodo.agregar(self.operando())
-        nodo.agregar(self.operador_aritmetico())
-        nodo.agregar(self.expresion())
+        if self.hay_suma_en_expresion():
+            nodo.agregar(self.termino())
+            nodo.agregar(self.resto_expresion_aritmetica())
+        else:
+            nodo.agregar(self.termino_aritmetico())
         return nodo
 
-    # <expresion> -> <termino> <resto_expresion>
+    def hay_suma_en_expresion(self) -> bool:
+        """True si el nivel superior de la expresion contiene '+' o '-'.
+
+        Como el lenguaje no tiene parentesis, cualquier '+'/'-' antes del
+        terminador pertenece al nivel superior. El escaneo se detiene en
+        '#', en EOF o en un operador relacional (fin de la expresion en
+        una condicion).
+        """
+        k = 0
+        while True:
+            tok = self.mirar(k)
+            if tok.tipo in {"HASH", "EOF", "OP_REL"}:
+                return False
+            if tok.tipo == "OP_ARIT" and tok.lexema in {"+", "-"}:
+                return True
+            k += 1
+
+    # <resto_expresion_aritmetica> -> + <termino> <resto_expresion>         (P14)
+    #                               | - <termino> <resto_expresion>         (P15)
+    def resto_expresion_aritmetica(self) -> Nodo:
+        nodo = Nodo("<resto_expresion_aritmetica>")
+        tok = self.consumir_operador({"+", "-"})
+        nodo.agregar(Nodo(tok.lexema, terminal=True))
+        nodo.agregar(self.termino())
+        nodo.agregar(self.resto_expresion())
+        return nodo
+
+    # <termino_aritmetico> -> <factor> <resto_termino_aritmetico>           (P16)
+    def termino_aritmetico(self) -> Nodo:
+        nodo = Nodo("<termino_aritmetico>")
+        nodo.agregar(self.factor())
+        nodo.agregar(self.resto_termino_aritmetico())
+        return nodo
+
+    # <resto_termino_aritmetico> -> * <factor> <resto_termino>              (P17)
+    #                             | / <factor> <resto_termino>              (P18)
+    #                             | % <factor> <resto_termino>              (P19)
+    def resto_termino_aritmetico(self) -> Nodo:
+        nodo = Nodo("<resto_termino_aritmetico>")
+        tok = self.consumir_operador({"*", "/", "%"})
+        nodo.agregar(Nodo(tok.lexema, terminal=True))
+        nodo.agregar(self.factor())
+        nodo.agregar(self.resto_termino())
+        return nodo
+
+    # <expresion> -> <termino> <resto_expresion>                            (P20)
     def expresion(self) -> Nodo:
         nodo = Nodo("<expresion>")
         nodo.agregar(self.termino())
         nodo.agregar(self.resto_expresion())
         return nodo
 
-    # <resto_expresion> -> + <termino> <resto_expresion>
-    #                    | - <termino> <resto_expresion>
-    #                    | epsilon
+    # <resto_expresion> -> + <termino> <resto_expresion>                    (P21)
+    #                    | - <termino> <resto_expresion>                    (P22)
+    #                    | epsilon                                         (P23)
     def resto_expresion(self) -> Nodo:
         nodo = Nodo("<resto_expresion>")
         if self.actual.tipo == "OP_ARIT" and self.actual.lexema in {"+", "-"}:
@@ -312,17 +387,17 @@ class Parser:
             nodo.agregar(Nodo("ε", terminal=True))
         return nodo
 
-    # <termino> -> <factor> <resto_termino>
+    # <termino> -> <factor> <resto_termino>                                (P24)
     def termino(self) -> Nodo:
         nodo = Nodo("<termino>")
         nodo.agregar(self.factor())
         nodo.agregar(self.resto_termino())
         return nodo
 
-    # <resto_termino> -> * <factor> <resto_termino>
-    #                  | / <factor> <resto_termino>
-    #                  | % <factor> <resto_termino>
-    #                  | epsilon
+    # <resto_termino> -> * <factor> <resto_termino>                        (P25)
+    #                  | / <factor> <resto_termino>                        (P26)
+    #                  | % <factor> <resto_termino>                        (P27)
+    #                  | epsilon                                           (P28)
     def resto_termino(self) -> Nodo:
         nodo = Nodo("<resto_termino>")
         if self.actual.tipo == "OP_ARIT" and self.actual.lexema in {"*", "/", "%"}:
@@ -333,13 +408,13 @@ class Parser:
             nodo.agregar(Nodo("ε", terminal=True))
         return nodo
 
-    # <factor> -> <operando>
+    # <factor> -> <operando>                                                (P29)
     def factor(self) -> Nodo:
         nodo = Nodo("<factor>")
         nodo.agregar(self.operando())
         return nodo
 
-    # <operando> -> <identificador> | <numero>
+    # <operando> -> <identificador> | <numero>                              (P30, P31)
     def operando(self) -> Nodo:
         nodo = Nodo("<operando>")
         if self.actual.tipo == "ID":
@@ -354,7 +429,7 @@ class Parser:
             )
         return nodo
 
-    # <salida> -> salida <identificador> #
+    # <salida> -> salida <identificador> #                                   (P32)
     def salida(self) -> Nodo:
         nodo = Nodo("<salida>")
         nodo.agregar(self.terminal("SALIDA", ["salida"]))
@@ -362,7 +437,7 @@ class Parser:
         nodo.agregar(self.terminal("HASH", ["#"]))
         return nodo
 
-    # <condicional> -> si <condicion> entonces <lista_instrucciones> fin_si
+    # <condicional> -> si <condicion> entonces <lista_instrucciones> fin_si  (P36)
     def condicional(self) -> Nodo:
         nodo = Nodo("<condicional>")
         nodo.agregar(self.terminal("SI", ["si"]))
@@ -372,7 +447,7 @@ class Parser:
         nodo.agregar(self.terminal("FIN_SI", ["fin_si"]))
         return nodo
 
-    # <condicion> -> <expresion> <operador_relacional> <expresion>
+    # <condicion> -> <expresion> <operador_relacional> <expresion>           (P37)
     def condicion(self) -> Nodo:
         nodo = Nodo("<condicion>")
         nodo.agregar(self.expresion())
@@ -380,33 +455,28 @@ class Parser:
         nodo.agregar(self.expresion())
         return nodo
 
+    # <operador_relacional> -> < | > | <= | >= | == | !=                  (P38-P43)
     def operador_relacional(self) -> Nodo:
         nodo = Nodo("<operador_relacional>")
         tok = self.consumir("OP_REL", ["<", ">", "<=", ">=", "==", "!="])
         nodo.agregar(Nodo(tok.lexema, terminal=True))
         return nodo
 
-    def operador_aritmetico(self) -> Nodo:
-        nodo = Nodo("<operador_aritmetico>")
-        tok = self.consumir("OP_ARIT", ["+", "-", "*", "/", "%"])
-        nodo.agregar(Nodo(tok.lexema, terminal=True))
-        return nodo
-
-    # <identificador> -> <letra> <resto_id>
+    # <identificador> -> ID                                                  (P33)
     def identificador(self) -> Nodo:
         nodo = Nodo("<identificador>")
         tok = self.consumir("ID", ["identificador"])
         nodo.agregar(Nodo(tok.lexema, terminal=True))
         return nodo
 
-    # <numero> -> <entero> [ '.' <entero> ]
+    # <numero> -> NUM                                                         (P34)
     def numero(self) -> Nodo:
         nodo = Nodo("<numero>")
         tok = self.consumir("NUM", ["numero"])
         nodo.agregar(Nodo(tok.lexema, terminal=True))
         return nodo
 
-    # <comentario> -> COMENTARIO
+    # <comentario> -> COMENT                                                  (P35)
     def comentario(self) -> Nodo:
         nodo = Nodo("<comentario>")
         tok = self.consumir("COMENT")
@@ -498,7 +568,7 @@ CASOS_P4 = [
     (2, "z = x + y #", True, "Asignacion aritmetica: operando, operador '+' y expresion."),
     (3, "salida z #", True, "Instruccion de salida completa."),
     (4, "x 10 #", False, "Falta el operador de asignacion '=' entre el identificador y el numero."),
-    (5, "z = + x y #", False, "El operador '+' esta en posicion inicial (falta el operando de la izquierda) y falta un operador entre 'x' e 'y'."),
+    (5, "z=+xy#", False, "El operador '+' aparece donde deberia empezar un operando: falta el operando izquierdo (el lenguaje no tiene operadores unarios). Si se separa como 'z = + x y #', ademas falta un operador entre 'x' e 'y'."),
     (6, "salida #", False, "Falta el identificador que se desea imprimir antes del '#'."),
     (7, "x = 20", False, "Falta el terminador de instruccion '#'."),
     (8, "Begin\nPrograma prueba\nx = 5 #\nsalida x #\nEnd", True, "Programa completo: Begin Programa <id> <instrucciones> End."),
@@ -513,6 +583,17 @@ CASOS_EXTENSION = [
      "Falta la condicion entre 'si' y 'entonces'."),
     ("si x >= 10 entonces salida x # fin_si", True,
      "Condicional con operador relacional de dos caracteres y salida interna."),
+    ("si x == 10 entonces y = 1 # fin_si", True,
+     "Condicional con el operador de igualdad '==' (dos caracteres)."),
+]
+
+# Control de precedencia: se comprueba la forma de la raiz de
+# <expresion_aritmetica> para asegurar que '*' '/' no absorben un '+'/'-'.
+CASOS_PRECEDENCIA = [
+    ("z = x + y #", ["<termino>", "<resto_expresion_aritmetica>"]),
+    ("z = a * b + c #", ["<termino>", "<resto_expresion_aritmetica>"]),
+    ("z = a + b * c #", ["<termino>", "<resto_expresion_aritmetica>"]),
+    ("z = a * b #", ["<termino_aritmetico>"]),
 ]
 
 PROGRAMA_REFERENCIA = """\
@@ -577,6 +658,29 @@ def validar_instruccion(texto: str) -> tuple[bool, str, Nodo | None]:
         return False, str(e), None
     except ErrorSintactico as e:
         return False, str(e), None
+
+
+def etiquetas_hijas(arbol: Nodo | None, simbolo: str) -> list[str] | None:
+    """Etiquetas de los hijos del primer nodo con `simbolo` (o None)."""
+    if arbol is None:
+        return None
+    if arbol.simbolo == simbolo:
+        return [h.simbolo for h in arbol.hijos]
+    for h in arbol.hijos:
+        encontrado = etiquetas_hijas(h, simbolo)
+        if encontrado is not None:
+            return encontrado
+    return None
+
+
+def hojas(arbol: Nodo) -> list[str]:
+    """Hojas terminales de izquierda a derecha, sin los nodos epsilon."""
+    if not arbol.hijos:
+        return [] if arbol.simbolo == "ε" else [arbol.simbolo]
+    resultado: list[str] = []
+    for h in arbol.hijos:
+        resultado.extend(hojas(h))
+    return resultado
 
 
 def main() -> int:
@@ -679,16 +783,7 @@ def main() -> int:
         )
         (salida / "arbol_z_igual_x_mas_y.mmd").write_text(mermaid(arbol) + "\n", encoding="utf-8")
         # hojas de izquierda a derecha (sin contar epsilon)
-        hojas = []
-
-        def recolectar(n: Nodo) -> None:
-            if not n.hijos and n.simbolo != "ε":
-                hojas.append(n.simbolo)
-            for h in n.hijos:
-                recolectar(h)
-
-        recolectar(arbol)
-        lineas.append(f"Fronda (hojas de izquierda a derecha): {' '.join(hojas)}")
+        lineas.append(f"Fronda (hojas de izquierda a derecha): {' '.join(hojas(arbol))}")
         lineas.append("")
     else:
         fallos += 1
@@ -717,6 +812,15 @@ if __name__ == "__main__":
         for cadena, esperado, _ in CASOS_EXTENSION:
             ok, _, _ = validar_instruccion(cadena)
             errores += ok != esperado
+        for cadena, esperado in CASOS_PRECEDENCIA:
+            ok, _, arbol = validar_instruccion(cadena)
+            errores += not (
+                ok and etiquetas_hijas(arbol, "<expresion_aritmetica>") == esperado
+            )
+        objetivo = "z = x + y #"
+        ok, _, arbol = validar_instruccion(objetivo)
+        esperado_hojas = [t.lexema for t in tokenizar(objetivo) if t.tipo != "EOF"]
+        errores += not (ok and arbol is not None and hojas(arbol) == esperado_hojas)
         print(f"Verificacion: {'OK' if errores == 0 else f'{errores} fallo(s)'}")
         sys.exit(0 if errores == 0 else 1)
     sys.exit(main())

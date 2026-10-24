@@ -27,9 +27,9 @@ Caso  Cadena                        Esperado   Obtenido   Estado
 4     x 10 #                        INVALIDA   INVALIDA   OK
       Analisis: se encontro NUM '10' (token NUM '10', linea 1, columna 3); se esperaba: =
       Justificacion: Falta el operador de asignacion '=' entre el identificador y el numero.
-5     z = + x y #                   INVALIDA   INVALIDA   OK
-      Analisis: se encontro OP_ARIT '+' (token OP_ARIT '+', linea 1, columna 5); se esperaba: ID, NUM
-      Justificacion: El operador '+' esta en posicion inicial (falta el operando de la izquierda) y falta un operador entre 'x' e 'y'.
+5     z=+xy#                        INVALIDA   INVALIDA   OK
+      Analisis: se encontro OP_ARIT '+' (token OP_ARIT '+', linea 1, columna 3); se esperaba: ID, NUM
+      Justificacion: El operador '+' aparece donde deberia empezar un operando: falta el operando izquierdo (el lenguaje no tiene operadores unarios). Si se separa como 'z = + x y #', ademas falta un operador entre 'x' e 'y'.
 6     salida #                      INVALIDA   INVALIDA   OK
       Analisis: se encontro HASH '#' (token HASH '#', linea 1, columna 8); se esperaba: identificador
       Justificacion: Falta el identificador que se desea imprimir antes del '#'.
@@ -65,6 +65,11 @@ Esperado : VALIDA
 Obtenido : VALIDA - Cadena valida
 Motivo   : Condicional con operador relacional de dos caracteres y salida interna.
 
+Cadena   : si x == 10 entonces y = 1 # fin_si
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Condicional con el operador de igualdad '==' (dos caracteres).
+
 
 ==============================================================================
 PREGUNTA 3 - Arbol de derivacion de 'z = x + y #'
@@ -78,12 +83,15 @@ Resultado: ACEPTADO - Cadena valida
         │   └── z
         ├── =
         ├── <expresion_aritmetica>
-        │   ├── <operando>
-        │   │   └── <identificador>
-        │   │       └── x
-        │   ├── <operador_aritmetico>
-        │   │   └── +
-        │   └── <expresion>
+        │   ├── <termino>
+        │   │   ├── <factor>
+        │   │   │   └── <operando>
+        │   │   │       └── <identificador>
+        │   │   │           └── x
+        │   │   └── <resto_termino>
+        │   │       └── ε
+        │   └── <resto_expresion_aritmetica>
+        │       ├── +
         │       ├── <termino>
         │       │   ├── <factor>
         │       │   │   └── <operando>

@@ -5,12 +5,15 @@
         │   └── z
         ├── =
         ├── <expresion_aritmetica>
-        │   ├── <operando>
-        │   │   └── <identificador>
-        │   │       └── x
-        │   ├── <operador_aritmetico>
-        │   │   └── +
-        │   └── <expresion>
+        │   ├── <termino>
+        │   │   ├── <factor>
+        │   │   │   └── <operando>
+        │   │   │       └── <identificador>
+        │   │   │           └── x
+        │   │   └── <resto_termino>
+        │   │       └── ε
+        │   └── <resto_expresion_aritmetica>
+        │       ├── +
         │       ├── <termino>
         │       │   ├── <factor>
         │       │   │   └── <operando>

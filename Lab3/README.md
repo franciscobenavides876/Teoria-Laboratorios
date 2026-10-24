@@ -25,7 +25,7 @@ Lab3/
 │   ├── Laboratorio_3_Informe.html    ← versión imprimible (origen del PDF)
 │   └── build_html.py                 ← regenera el HTML desde el Markdown
 └── gramatica/
-    ├── Lab3_gramatica.bnf            ← gramática G = (V, Σ, P, S) en BNF, 41 producciones
+    ├── Lab3_gramatica.bnf            ← gramática G = (V, Σ, P, S) en BNF, 43 producciones
     ├── gramatica.py                  ← validador: léxico + sintáctico + árbol + pruebas
     └── salidas/                      ← evidencia generada por gramatica.py
         ├── validacion.txt                    (P2 y P4: resultados completos)
@@ -41,7 +41,7 @@ Lab3/
 | Pregunta | Puntos | Contenido | Dónde verlo |
 |---|:---:|---|---|
 | **P1.** Identificación formal | 20 | Terminales clasificados, no terminales, símbolo inicial, `G=(V,Σ,P,S)` y justificación de por qué no se enumeran identificadores/números. | Informe §3 |
-| **P2.** Construcción de la GLC | 30 | 41 producciones numeradas, explicación de cada no terminal, distinción asignación simple / aritmética / salida y verificación del programa de referencia. | Informe §4 + `gramatica/Lab3_gramatica.bnf` |
+| **P2.** Construcción de la GLC | 30 | 43 producciones numeradas, explicación de cada no terminal, distinción asignación simple / aritmética / salida y verificación del programa de referencia. | Informe §4 + `gramatica/Lab3_gramatica.bnf` |
 | **P3.** Derivaciones y árbol | 25 | Dos derivaciones por la izquierda, árbol de `z = x + y #`, explicación raíz/nodos/hojas y pertenencia de tres cadenas. | Informe §5 + `gramatica/salidas/arbol_*` |
 | **P4.** Validación y errores | 25 | Análisis de los 8 casos, con el elemento sintáctico faltante o mal ubicado en cada cadena inválida. | Informe §6 + `gramatica/salidas/validacion.txt` |
 | **Extensión creativa** | (transversal) | Opción A: `si … entonces … fin_si`, con sintaxis, gramática modificada, cadenas válida/inválida y derivación. | Informe §7 |
@@ -100,7 +100,7 @@ Opción B: extensión *Markdown PDF* de VS Code sobre `Laboratorio_3_Informe.md`
 ## Checklist antes de entregar
 
 - [x] P1: terminales, no terminales, símbolo inicial y `G=(V,Σ,P,S)` definidos
-- [x] P2: gramática completa (41 producciones) + verificación del programa de referencia
+- [x] P2: gramática completa (43 producciones) + verificación del programa de referencia
 - [x] P3: derivaciones por la izquierda + árbol + explicación + pertenencia de cadenas
 - [x] P4: tabla de los 8 casos + análisis de errores
 - [x] Extensión creativa (Opción A) formalizada y validada
