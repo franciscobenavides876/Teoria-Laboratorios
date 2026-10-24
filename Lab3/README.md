@@ -1,10 +1,10 @@
-# Laboratorio 3 — Diseño y Validación de Gramáticas
+﻿# Laboratorio 3 — Diseño y Validación de Gramáticas
 
 **Asignatura:** Teoría de la Computación — INFO1148
 **Tema:** Gramáticas Libres de Contexto (GLC)
 **Modalidad:** Laboratorio práctico (parejas)
 **Puntaje:** 100 puntos
-**Entrega:** Informe + evidencias
+**Entrega:** Evidencias (validador + gramática + salidas)
 
 Esta carpeta (`Lab3/`) contiene el desarrollo completo de la Pregunta 1 a la Pregunta 4, la
 extensión creativa y las evidencias de ejecución del Laboratorio 3.
@@ -16,107 +16,62 @@ extensión creativa y las evidencias de ejecución del Laboratorio 3.
 
 ## Estructura
 
-```
+```text
 Lab3/
-├── README.md                         ← este archivo (guía de la carpeta)
-├── informe/
-│   ├── Laboratorio_3_Informe.pdf     ← ENTREGABLE (13 páginas, PDF)
-│   ├── Laboratorio_3_Informe.md      ← informe completo (fuente)
-│   ├── Laboratorio_3_Informe.html    ← versión imprimible (origen del PDF)
-│   └── build_html.py                 ← regenera el HTML desde el Markdown
+├── README.md
 └── gramatica/
     ├── Lab3_gramatica.bnf            ← gramática G = (V, Σ, P, S) en BNF, 45 producciones
     ├── gramatica.py                  ← validador: léxico + sintáctico + árbol + pruebas
     └── salidas/                      ← evidencia generada por gramatica.py
-        ├── validacion.txt                    (P2, P4, extensión y comentarios)
-        ├── arbol_z_igual_x_mas_y.txt         (P3: árbol en texto)
-        ├── arbol_z_igual_x_mas_y.dot         (P3: árbol en Graphviz)
-        ├── arbol_z_igual_x_mas_y.mmd         (P3: árbol en Mermaid)
-        ├── arbol_z_igual_x_mas_y.png         (P3: captura; regenerable con Graphviz)
-        └── arbol_programa_referencia.dot     (P2: árbol del programa completo)
+        ├── validacion.txt
+        ├── arbol_z_igual_x_mas_y.txt
+        ├── arbol_z_igual_x_mas_y.dot
+        ├── arbol_z_igual_x_mas_y.mmd
+        ├── arbol_z_igual_x_mas_y.png
+        └── arbol_programa_referencia.dot
 ```
 
 ## Qué se entrega en cada pregunta
 
 | Pregunta | Puntos | Contenido | Dónde verlo |
 |---|:---:|---|---|
-| **P1.** Identificación formal | 20 | Terminales clasificados, no terminales, símbolo inicial, `G=(V,Σ,P,S)` y justificación de por qué no se enumeran identificadores/números. | Informe §3 |
-| **P2.** Construcción de la GLC | 30 | 45 producciones numeradas, explicación de cada no terminal, distinción asignación simple / aritmética / salida y verificación del programa de referencia. | Informe §4 + `gramatica/Lab3_gramatica.bnf` |
-| **P3.** Derivaciones y árbol | 25 | Dos derivaciones por la izquierda, árbol de `z = x + y #`, explicación raíz/nodos/hojas y pertenencia de tres cadenas. | Informe §5 + `gramatica/salidas/arbol_*` |
-| **P4.** Validación y errores | 25 | Análisis de los 8 casos, con el elemento sintáctico faltante o mal ubicado en cada cadena inválida. | Informe §6 + `gramatica/salidas/validacion.txt` |
-| **Extensión creativa** | (transversal) | Opción A: `si … entonces … fin_si`, con sintaxis, gramática modificada, cadenas válida/inválida y derivación. | Informe §7 |
+| **P1.** Identificación formal | 20 | Terminales clasificados, no terminales, símbolo inicial, `G=(V,Σ,P,S)` y justificación de por qué no se enumeran identificadores/números. | `gramatica/Lab3_gramatica.bnf` + `gramatica/gramatica.py` |
+| **P2.** Construcción de la GLC | 30 | 45 producciones numeradas, explicación, distinción asignación simple / aritmética / salida y verificación del programa de referencia. | `gramatica/Lab3_gramatica.bnf` + `gramatica/salidas/validacion.txt` |
+| **P3.** Derivaciones y árbol | 25 | Dos derivaciones por la izquierda, árbol de `z = x + y #`, explicación raíz/nodos/hojas y pertenencia de tres cadenas. | `gramatica/salidas/arbol_*` |
+| **P4.** Validación y errores | 25 | Análisis de los 8 casos, con el elemento sintáctico faltante o mal ubicado en cada cadena inválida. | `gramatica/salidas/validacion.txt` |
+| **Extensión creativa** | (transversal) | Opción A: `si … entonces … fin_si`, formalizada y validated. | `gramatica/gramatica.py` + `gramatica/salidas/validacion.txt` |
 
 ## Cómo reproducir la evidencia
 
-Requisitos: **Python 3.9+** (solo biblioteca estándar para el validador). Para regenerar el PNG
-del árbol hace falta **Graphviz** (`dot`).
+Requisitos: **Python 3.9+** (solo biblioteca estándar).
 
 ```bash
-# Valida el programa de referencia, la tabla de la P4 y la extensión,
-# y regenera la carpeta gramatica/salidas/ (txt, dot, mmd y validacion.txt)
+# Valida el programa de referencia, la tabla de P4 y la extensión
 python Lab3/gramatica/gramatica.py
 
 # Comprobación rápida (código de salida 0 = todos los casos coinciden)
 python Lab3/gramatica/gramatica.py --check
-
-# El PNG no lo escribe gramatica.py; se regenera desde el .dot:
-dot -Tpng Lab3/gramatica/salidas/arbol_z_igual_x_mas_y.dot \
-        -o Lab3/gramatica/salidas/arbol_z_igual_x_mas_y.png
 ```
 
-Resultado esperado: `python …` imprime `Fallos: 0`; `python … --check` imprime
-`Verificacion: OK`. La salida completa queda en `gramatica/salidas/validacion.txt`.
-
-## Cómo generar el PDF del informe
-
-Opción A (recomendada, sin instalar nada más):
-
-```bash
-python Lab3/informe/build_html.py      # requiere: pip install markdown-it-py
-```
-
-Luego abrir `Lab3/informe/Laboratorio_3_Informe.html` en un navegador y usar
-**Imprimir → Guardar como PDF** (A4, márgenes predeterminados, activar «Gráficos de fondo»).
-Los diagramas Mermaid se dibujan al abrir el archivo (necesita Internet); el árbol también está
-en texto y como captura PNG por si no hay conexión.
-
-Opción B: extensión *Markdown PDF* de VS Code sobre `Laboratorio_3_Informe.md`.
-
-> El PDF ya está generado (`informe/Laboratorio_3_Informe.pdf`, 13 páginas).
-> El PDF final se entrega por la vía indicada por el profesor, con la nomenclatura que él
-> solicite; esta carpeta guarda la fuente y la evidencia.
+Resultado esperado: `python …` imprime `Fallos: 0`; `python … --check` imprime `Verificacion: OK`. La salida completa queda en `gramatica/salidas/validacion.txt`.
 
 ## Notas y decisiones de diseño
 
-- **Terminales como clases de token.** `ID`, `NUM` y `COMENT` son terminales únicos; su forma se
-  define con expresiones regulares (Anexo A del informe). Así Σ y `P` son finitos aunque el
-  lenguaje tenga infinitos identificadores y números.
-- **Asignación simple vs. aritmética.** Se separan en `P12` y `P13` para evitar ambigüedad: si
-  ambas compartieran una sola producción con `<expresion>`, `x = 20 #` tendría dos árboles.
-- **Precedencia.** `<expresion> → <termino> → <factor> → <operando>` hace que `* / %` liguen más
-  fuerte que `+ -`, sin necesidad de paréntesis.
-- **Asignación aritmética no ambigua.** `P14–P21` obligan a que haya al menos un operador sin
-  perder la precedencia: las variantes «no vacías» de las colas (`<resto_expresion_aritmetica>`,
-  `<resto_termino_aritmetico>`) permiten distinguir `x = 20 #` (simple) de `x = a * b #`
-  (aritmética) sin aceptar expresiones sin operador.
-- **Comentarios.** `/* … */` se reconoce como un token (`COMENT`) y se admite antes, entre y
-  después de las instrucciones (`P2–P6`); así el programa de referencia y un comentario final
-  antes de `End` o `fin_si` son derivables, sin permitir programas sin instrucciones.
-- **Extensión.** Se eligió la Opción A (condicional) por ser la construcción de control más
-  representativa; no se agregó `sino` para mantener la gramática no ambigua.
-- **Sin JFLAP.** El árbol se genera con el propio analizador y se exporta a `.dot`/`.mmd`, por lo
-  que no hace falta adjuntar archivos `.jff` (el enunciado solo los exige «si se utiliza JFLAP»).
+- **Terminales como clases de token.** `ID`, `NUM` y `COMENT` are terminales únicos; su forma se define con expresiones regulares. Así Σ y `P` son finitos aunque el lenguaje tenga infinitos identificadores y números.
+- **Asignación simple vs. aritmética.** Se separan en `P12` y `P13` para evitar ambigüedad.
+- **Precedencia.** `<expresion> → <termino> → <factor> → <operando>` hace que `* / %` liguen más fuerte que `+ -`.
+- **Comentarios.** `/* … */` se reconoce como `COMENT` y se admite antes, entre y después de las instrucciones.
+- **Extensión.** Se eligió la Opción A (`si … entonces … fin_si`) sin `sino` para mantener la gramática no ambigua.
+- **Sin JFLAP.** El árbol se genera con el propio analizador y se exporta a `.dot`/`.mmd`.
 
 ## Checklist antes de entregar
 
-- [x] P1: terminales, no terminales, símbolo inicial y `G=(V,Σ,P,S)` definidos
+- [x] P1: terminales, no terminales, símbolo inicial and `G=(V,Σ,P,S)` definidos
 - [x] P2: gramática completa (45 producciones) + verificación del programa de referencia
 - [x] P3: derivaciones por la izquierda + árbol + explicación + pertenencia de cadenas
 - [x] P4: tabla de los 8 casos + análisis de errores
-- [x] Extensión creativa (Opción A) formalizada y validada
+- [x] Extensión creativa (Opción A) formalizada and validated
 - [x] Evidencia ejecutable (`gramatica.py` → `Fallos: 0`)
-- [x] Captura del árbol de derivación (PNG) + archivos `.dot`/`.mmd`
-- [x] Informe exportado a PDF (13 páginas) en `informe/Laboratorio_3_Informe.pdf`
+- [x] Archivos `.dot`/.mmd`/`.txt`/`.png` del árbol de derivación
+- [x] Informe entregado desde Overleaf (PDF)
 - [x] Integrantes completos: Francisco Benavides y Marcelo Matamala
-- [ ] Renombrar el PDF según la convención del profesor y subirlo por la vía indicada
-- [ ] Confirmar con el profesor si desea el árbol en JFLAP además del `.dot`/`.mmd`
