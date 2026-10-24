@@ -1,0 +1,26 @@
+<instruccion>
+└── <asignacion>
+    └── <asignacion_aritmetica>
+        ├── <identificador>
+        │   └── z
+        ├── =
+        ├── <expresion_aritmetica>
+        │   ├── <termino>
+        │   │   ├── <factor>
+        │   │   │   └── <operando>
+        │   │   │       └── <identificador>
+        │   │   │           └── x
+        │   │   └── <resto_termino>
+        │   │       └── ε
+        │   └── <resto_expresion_aritmetica>
+        │       ├── +
+        │       ├── <termino>
+        │       │   ├── <factor>
+        │       │   │   └── <operando>
+        │       │   │       └── <identificador>
+        │       │   │           └── y
+        │       │   └── <resto_termino>
+        │       │       └── ε
+        │       └── <resto_expresion>
+        │           └── ε
+        └── #

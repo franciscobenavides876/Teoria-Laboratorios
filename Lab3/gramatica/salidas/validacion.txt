@@ -1,0 +1,151 @@
+==============================================================================
+PREGUNTA 2 - Programa de referencia completo
+==============================================================================
+Resultado: ACEPTADO - Cadena valida
+
+Instrucciones reconocidas en el programa de referencia:
+  - asignaciones simples      : 6
+  - asignaciones aritmeticas  : 7
+  - instrucciones de salida   : 7
+  - comentarios               : 1
+  - total de elementos        : 21
+(arbol completo exportado en salidas/arbol_programa_referencia.dot)
+
+==============================================================================
+PREGUNTA 4 - Validacion de cadenas
+==============================================================================
+Caso  Cadena                        Esperado   Obtenido   Estado
+1     x = 10 #                      VALIDA     VALIDA     OK
+      Analisis: Cadena valida
+      Justificacion: Asignacion simple: identificador, '=', numero y terminador.
+2     z = x + y #                   VALIDA     VALIDA     OK
+      Analisis: Cadena valida
+      Justificacion: Asignacion aritmetica: operando, operador '+' y expresion.
+3     salida z #                    VALIDA     VALIDA     OK
+      Analisis: Cadena valida
+      Justificacion: Instruccion de salida completa.
+4     x 10 #                        INVALIDA   INVALIDA   OK
+      Analisis: se encontro NUM '10' en linea 1, columna 3; se esperaba: =
+      Justificacion: Falta el operador de asignacion '=' entre el identificador y el numero.
+5     z=+xy#                        INVALIDA   INVALIDA   OK
+      Analisis: se encontro OP_ARIT '+' en linea 1, columna 3; se esperaba: ID, NUM
+      Justificacion: El operador '+' aparece donde deberia empezar un operando: falta el operando izquierdo (el lenguaje no tiene operadores unarios). Si se separa como 'z = + x y #', ademas falta un operador entre 'x' e 'y'.
+6     salida #                      INVALIDA   INVALIDA   OK
+      Analisis: se encontro HASH '#' en linea 1, columna 8; se esperaba: identificador
+      Justificacion: Falta el identificador que se desea imprimir antes del '#'.
+7     x = 20                        INVALIDA   INVALIDA   OK
+      Analisis: se encontro EOF '<fin de entrada>' en linea 1, columna 7; se esperaba: #
+      Justificacion: Falta el terminador de instruccion '#'.
+8     Begin Programa prueba x =...  VALIDA     VALIDA     OK
+      Cadena completa (los saltos de linea se muestran como ' / '):
+      Begin / Programa prueba / x = 5 # / salida x # / End
+      Analisis: Cadena valida
+      Justificacion: Programa completo: Begin Programa <id> <instrucciones> End.
+
+==============================================================================
+EXTENSION CREATIVA (opcion A) - condicional si ... entonces ... fin_si
+==============================================================================
+Cadena   : si x > 10 entonces y = x + 1 # fin_si
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Condicional valido: condicion con operador relacional y bloque de instrucciones.
+
+Cadena   : si x > 10 entonces y = x + 1 #
+Esperado : INVALIDA
+Obtenido : INVALIDA - se encontro EOF '<fin de entrada>' en linea 1, columna 31; se esperaba: fin_si
+Motivo   : Falta el cierre 'fin_si' del condicional.
+
+Cadena   : si entonces y = 1 # fin_si
+Esperado : INVALIDA
+Obtenido : INVALIDA - se encontro ENTONCES 'entonces' en linea 1, columna 4; se esperaba: ID, NUM
+Motivo   : Falta la condicion entre 'si' y 'entonces'.
+
+Cadena   : si x >= 10 entonces salida x # fin_si
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Condicional con operador relacional de dos caracteres y salida interna.
+
+Cadena   : si x == 10 entonces y = 1 # fin_si
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Condicional con el operador de igualdad '==' (dos caracteres).
+
+
+==============================================================================
+COMENTARIOS - antes, entre y despues de las instrucciones
+==============================================================================
+Cadena   : Begin Programa p /* inicial */ x = 1 # End
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Comentario antes de la primera instruccion.
+
+Cadena   : Begin Programa p x = 1 # /* entre */ y = 2 # End
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Comentario entre dos instrucciones.
+
+Cadena   : Begin Programa p x = 1 # /* final */ End
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Comentario despues de la ultima instruccion, antes de End.
+
+Cadena   : Begin Programa p /* solo comentario */ End
+Esperado : INVALIDA
+Obtenido : INVALIDA - se encontro END 'End' en linea 1, columna 40; se esperaba: ID, salida, si
+Motivo   : Un programa requiere al menos una instruccion.
+
+Cadena   : si x > 1 entonces y = 1 # /* final */ fin_si
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Comentario final antes de fin_si.
+
+Cadena   : si x > 1 entonces /* inicial */ y = 1 # fin_si
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Comentario al inicio del cuerpo del condicional.
+
+Cadena   : Begin Programa p si x > 1 entonces y = 1 # fin_si /* final */ End
+Esperado : VALIDA
+Obtenido : VALIDA - Cadena valida
+Motivo   : Comentario final despues de un condicional, antes de End.
+
+Cadena   : si x > 1 entonces /* solo comentario */ fin_si
+Esperado : INVALIDA
+Obtenido : INVALIDA - se encontro FIN_SI 'fin_si' en linea 1, columna 41; se esperaba: ID, salida, si
+Motivo   : El cuerpo del condicional requiere al menos una instruccion.
+
+
+==============================================================================
+PREGUNTA 3 - Arbol de derivacion de 'z = x + y #'
+==============================================================================
+Resultado: ACEPTADO - Cadena valida
+
+<instruccion>
+└── <asignacion>
+    └── <asignacion_aritmetica>
+        ├── <identificador>
+        │   └── z
+        ├── =
+        ├── <expresion_aritmetica>
+        │   ├── <termino>
+        │   │   ├── <factor>
+        │   │   │   └── <operando>
+        │   │   │       └── <identificador>
+        │   │   │           └── x
+        │   │   └── <resto_termino>
+        │   │       └── ε
+        │   └── <resto_expresion_aritmetica>
+        │       ├── +
+        │       ├── <termino>
+        │       │   ├── <factor>
+        │       │   │   └── <operando>
+        │       │   │       └── <identificador>
+        │       │   │           └── y
+        │       │   └── <resto_termino>
+        │       │       └── ε
+        │       └── <resto_expresion>
+        │           └── ε
+        └── #
+
+Fronda (hojas de izquierda a derecha): z = x + y #
+
