@@ -7,10 +7,13 @@
    epsilon = produccion vacia (cadena vacia).
    ID, NUM y COMENT son clases lexicas (ver Anexo A del informe).
 
-   P1 - P35  : nucleo del lenguaje solicitado.
-   P36 - P43 : extension creativa (Opcion A: condicional).
+   Nucleo    : P1-P8 y P10-P37 (36 producciones).
+   Extension : P9 y P38-P45 (9 producciones; Opcion A: condicional).
 
-   El bloque P12-P19 obliga a que una asignacion aritmetica contenga al
+   La lista de instrucciones exige al menos una instruccion, pero admite
+   comentarios antes, entre y despues de las instrucciones (P2-P6).
+
+   El bloque P14-P21 obliga a que una asignacion aritmetica contenga al
    menos un operador (para no solaparse con <asignacion_simple>) SIN
    romper la precedencia: <resto_expresion_aritmetica> exige un '+' o
    '-' de nivel superior y <termino_aritmetico> exige un '*'/'/'/'%'
@@ -20,70 +23,73 @@
 (* ---------- Estructura del programa ---------------------------------- *)
 <programa>              ::= Begin Programa <identificador> <lista_instrucciones> End  (* P1  *)
 
-<lista_instrucciones>   ::= <instruccion>                                               (* P2  *)
-                          | <instruccion> <lista_instrucciones>                         (* P3  *)
-                          | <comentario> <lista_instrucciones>                          (* P4  *)
+<lista_instrucciones>   ::= <comentario> <lista_instrucciones>                          (* P2  *)
+                          | <instruccion> <resto_lista>                                 (* P3  *)
 
-<instruccion>           ::= <asignacion>                                                (* P5  *)
-                          | <salida>                                                    (* P6  *)
-                          | <condicional>                                               (* P7  *)
+<resto_lista>           ::= <instruccion> <resto_lista>                                 (* P4  *)
+                          | <comentario> <resto_lista>                                  (* P5  *)
+                          | epsilon                                                     (* P6  *)
+
+<instruccion>           ::= <asignacion>                                                (* P7  *)
+                          | <salida>                                                    (* P8  *)
+                          | <condicional>                                               (* P9  *)
 
 (* ---------- Asignacion ------------------------------------------------ *)
-<asignacion>            ::= <asignacion_simple>                                         (* P8  *)
-                          | <asignacion_aritmetica>                                     (* P9  *)
+<asignacion>            ::= <asignacion_simple>                                         (* P10 *)
+                          | <asignacion_aritmetica>                                     (* P11 *)
 
-<asignacion_simple>     ::= <identificador> = <operando> #                              (* P10 *)
+<asignacion_simple>     ::= <identificador> = <operando> #                              (* P12 *)
 
-<asignacion_aritmetica> ::= <identificador> = <expresion_aritmetica> #                  (* P11 *)
+<asignacion_aritmetica> ::= <identificador> = <expresion_aritmetica> #                  (* P13 *)
 
 (* ---------- Expresion aritmetica (con al menos un operador) ----------- *)
-<expresion_aritmetica>      ::= <termino> <resto_expresion_aritmetica>                  (* P12 *)
-                              | <termino_aritmetico>                                    (* P13 *)
+<expresion_aritmetica>      ::= <termino> <resto_expresion_aritmetica>                  (* P14 *)
+                              | <termino_aritmetico>                                    (* P15 *)
 
-<resto_expresion_aritmetica> ::= + <termino> <resto_expresion>                          (* P14 *)
-                               | - <termino> <resto_expresion>                          (* P15 *)
+<resto_expresion_aritmetica> ::= + <termino> <resto_expresion>                          (* P16 *)
+                               | - <termino> <resto_expresion>                          (* P17 *)
 
-<termino_aritmetico>        ::= <factor> <resto_termino_aritmetico>                     (* P16 *)
+<termino_aritmetico>        ::= <factor> <resto_termino_aritmetico>                     (* P18 *)
 
-<resto_termino_aritmetico>  ::= * <factor> <resto_termino>                              (* P17 *)
-                              | / <factor> <resto_termino>                              (* P18 *)
-                              | % <factor> <resto_termino>                              (* P19 *)
+<resto_termino_aritmetico>  ::= * <factor> <resto_termino>                              (* P19 *)
+                              | / <factor> <resto_termino>                              (* P20 *)
+                              | % <factor> <resto_termino>                              (* P21 *)
 
 (* ---------- Expresiones aritmeticas (nucleo) -------------------------- *)
-<expresion>             ::= <termino> <resto_expresion>                                 (* P20 *)
+<expresion>             ::= <termino> <resto_expresion>                                 (* P22 *)
 
-<resto_expresion>       ::= + <termino> <resto_expresion>                               (* P21 *)
-                          | - <termino> <resto_expresion>                               (* P22 *)
-                          | epsilon                                                     (* P23 *)
+<resto_expresion>       ::= + <termino> <resto_expresion>                               (* P23 *)
+                          | - <termino> <resto_expresion>                               (* P24 *)
+                          | epsilon                                                     (* P25 *)
 
-<termino>               ::= <factor> <resto_termino>                                    (* P24 *)
+<termino>               ::= <factor> <resto_termino>                                    (* P26 *)
 
-<resto_termino>         ::= * <factor> <resto_termino>                                  (* P25 *)
-                          | / <factor> <resto_termino>                                  (* P26 *)
-                          | % <factor> <resto_termino>                                  (* P27 *)
-                          | epsilon                                                     (* P28 *)
+<resto_termino>         ::= * <factor> <resto_termino>                                  (* P27 *)
+                          | / <factor> <resto_termino>                                  (* P28 *)
+                          | % <factor> <resto_termino>                                  (* P29 *)
+                          | epsilon                                                     (* P30 *)
 
-<factor>                ::= <operando>                                                  (* P29 *)
+<factor>                ::= <operando>                                                  (* P31 *)
 
-<operando>              ::= <identificador>                                             (* P30 *)
-                          | <numero>                                                    (* P31 *)
+<operando>              ::= <identificador>                                             (* P32 *)
+                          | <numero>                                                    (* P33 *)
 
 (* ---------- Salida ---------------------------------------------------- *)
-<salida>                ::= salida <identificador> #                                    (* P32 *)
+<salida>                ::= salida <identificador> #                                    (* P34 *)
 
 (* ---------- Nivel lexico (clases de token) --------------------------- *)
-<identificador>         ::= ID                                                          (* P33 *)
-<numero>                ::= NUM                                                         (* P34 *)
-<comentario>            ::= COMENT                                                      (* P35 *)
+<identificador>         ::= ID                                                          (* P35 *)
+<numero>                ::= NUM                                                         (* P36 *)
+<comentario>            ::= COMENT                                                      (* P37 *)
 
 (* ---------- Extension creativa: condicional (Opcion A) ---------------- *)
-<condicional>           ::= si <condicion> entonces <lista_instrucciones> fin_si        (* P36 *)
+<condicional>           ::= si <condicion> entonces <lista_instrucciones> fin_si        (* P38 *)
 
-<condicion>             ::= <expresion> <operador_relacional> <expresion>               (* P37 *)
+<condicion>             ::= <expresion> <operador_relacional> <expresion>               (* P39 *)
 
-<operador_relacional>   ::= <                                                           (* P38 *)
-                          | >                                                           (* P39 *)
-                          | <=                                                          (* P40 *)
-                          | >=                                                          (* P41 *)
-                          | ==                                                          (* P42 *)
-                          | !=                                                          (* P43 *)
+<operador_relacional>   ::= <                                                           (* P40 *)
+                          | >                                                           (* P41 *)
+                          | <=                                                          (* P42 *)
+                          | >=                                                          (* P43 *)
+                          | ==                                                          (* P44 *)
+                          | !=                                                          (* P45 *)

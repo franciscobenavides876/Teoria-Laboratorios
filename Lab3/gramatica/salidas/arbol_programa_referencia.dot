@@ -33,7 +33,7 @@ digraph arbol {
   n13 -> n14;
   n15 [label="#", shape=plaintext];
   n8 -> n15;
-  n16 [label="<lista_instrucciones>", shape=box];
+  n16 [label="<resto_lista>", shape=box];
   n5 -> n16;
   n17 [label="<instruccion>", shape=box];
   n16 -> n17;
@@ -55,13 +55,13 @@ digraph arbol {
   n24 -> n25;
   n26 [label="#", shape=plaintext];
   n19 -> n26;
-  n27 [label="<lista_instrucciones>", shape=box];
+  n27 [label="<resto_lista>", shape=box];
   n16 -> n27;
   n28 [label="<comentario>", shape=box];
   n27 -> n28;
   n29 [label="/* operaciones y salidas */", shape=plaintext];
   n28 -> n29;
-  n30 [label="<lista_instrucciones>", shape=box];
+  n30 [label="<resto_lista>", shape=box];
   n27 -> n30;
   n31 [label="<instruccion>", shape=box];
   n30 -> n31;
@@ -115,7 +115,7 @@ digraph arbol {
   n54 -> n55;
   n56 [label="#", shape=plaintext];
   n33 -> n56;
-  n57 [label="<lista_instrucciones>", shape=box];
+  n57 [label="<resto_lista>", shape=box];
   n30 -> n57;
   n58 [label="<instruccion>", shape=box];
   n57 -> n58;
@@ -169,7 +169,7 @@ digraph arbol {
   n81 -> n82;
   n83 [label="#", shape=plaintext];
   n60 -> n83;
-  n84 [label="<lista_instrucciones>", shape=box];
+  n84 [label="<resto_lista>", shape=box];
   n57 -> n84;
   n85 [label="<instruccion>", shape=box];
   n84 -> n85;
@@ -223,7 +223,7 @@ digraph arbol {
   n108 -> n109;
   n110 [label="#", shape=plaintext];
   n87 -> n110;
-  n111 [label="<lista_instrucciones>", shape=box];
+  n111 [label="<resto_lista>", shape=box];
   n84 -> n111;
   n112 [label="<instruccion>", shape=box];
   n111 -> n112;
@@ -277,7 +277,7 @@ digraph arbol {
   n135 -> n136;
   n137 [label="#", shape=plaintext];
   n114 -> n137;
-  n138 [label="<lista_instrucciones>", shape=box];
+  n138 [label="<resto_lista>", shape=box];
   n111 -> n138;
   n139 [label="<instruccion>", shape=box];
   n138 -> n139;
@@ -321,7 +321,7 @@ digraph arbol {
   n157 -> n158;
   n159 [label="#", shape=plaintext];
   n141 -> n159;
-  n160 [label="<lista_instrucciones>", shape=box];
+  n160 [label="<resto_lista>", shape=box];
   n138 -> n160;
   n161 [label="<instruccion>", shape=box];
   n160 -> n161;
@@ -365,7 +365,7 @@ digraph arbol {
   n179 -> n180;
   n181 [label="#", shape=plaintext];
   n163 -> n181;
-  n182 [label="<lista_instrucciones>", shape=box];
+  n182 [label="<resto_lista>", shape=box];
   n160 -> n182;
   n183 [label="<instruccion>", shape=box];
   n182 -> n183;
@@ -409,7 +409,7 @@ digraph arbol {
   n201 -> n202;
   n203 [label="#", shape=plaintext];
   n185 -> n203;
-  n204 [label="<lista_instrucciones>", shape=box];
+  n204 [label="<resto_lista>", shape=box];
   n182 -> n204;
   n205 [label="<instruccion>", shape=box];
   n204 -> n205;
@@ -423,7 +423,7 @@ digraph arbol {
   n208 -> n209;
   n210 [label="#", shape=plaintext];
   n206 -> n210;
-  n211 [label="<lista_instrucciones>", shape=box];
+  n211 [label="<resto_lista>", shape=box];
   n204 -> n211;
   n212 [label="<instruccion>", shape=box];
   n211 -> n212;
@@ -437,7 +437,7 @@ digraph arbol {
   n215 -> n216;
   n217 [label="#", shape=plaintext];
   n213 -> n217;
-  n218 [label="<lista_instrucciones>", shape=box];
+  n218 [label="<resto_lista>", shape=box];
   n211 -> n218;
   n219 [label="<instruccion>", shape=box];
   n218 -> n219;
@@ -451,7 +451,7 @@ digraph arbol {
   n222 -> n223;
   n224 [label="#", shape=plaintext];
   n220 -> n224;
-  n225 [label="<lista_instrucciones>", shape=box];
+  n225 [label="<resto_lista>", shape=box];
   n218 -> n225;
   n226 [label="<instruccion>", shape=box];
   n225 -> n226;
@@ -465,7 +465,7 @@ digraph arbol {
   n229 -> n230;
   n231 [label="#", shape=plaintext];
   n227 -> n231;
-  n232 [label="<lista_instrucciones>", shape=box];
+  n232 [label="<resto_lista>", shape=box];
   n225 -> n232;
   n233 [label="<instruccion>", shape=box];
   n232 -> n233;
@@ -479,7 +479,7 @@ digraph arbol {
   n236 -> n237;
   n238 [label="#", shape=plaintext];
   n234 -> n238;
-  n239 [label="<lista_instrucciones>", shape=box];
+  n239 [label="<resto_lista>", shape=box];
   n232 -> n239;
   n240 [label="<instruccion>", shape=box];
   n239 -> n240;
@@ -501,7 +501,7 @@ digraph arbol {
   n247 -> n248;
   n249 [label="#", shape=plaintext];
   n242 -> n249;
-  n250 [label="<lista_instrucciones>", shape=box];
+  n250 [label="<resto_lista>", shape=box];
   n239 -> n250;
   n251 [label="<instruccion>", shape=box];
   n250 -> n251;
@@ -523,7 +523,7 @@ digraph arbol {
   n258 -> n259;
   n260 [label="#", shape=plaintext];
   n253 -> n260;
-  n261 [label="<lista_instrucciones>", shape=box];
+  n261 [label="<resto_lista>", shape=box];
   n250 -> n261;
   n262 [label="<instruccion>", shape=box];
   n261 -> n262;
@@ -545,7 +545,7 @@ digraph arbol {
   n269 -> n270;
   n271 [label="#", shape=plaintext];
   n264 -> n271;
-  n272 [label="<lista_instrucciones>", shape=box];
+  n272 [label="<resto_lista>", shape=box];
   n261 -> n272;
   n273 [label="<instruccion>", shape=box];
   n272 -> n273;
@@ -567,7 +567,7 @@ digraph arbol {
   n280 -> n281;
   n282 [label="#", shape=plaintext];
   n275 -> n282;
-  n283 [label="<lista_instrucciones>", shape=box];
+  n283 [label="<resto_lista>", shape=box];
   n272 -> n283;
   n284 [label="<instruccion>", shape=box];
   n283 -> n284;
@@ -581,7 +581,7 @@ digraph arbol {
   n287 -> n288;
   n289 [label="#", shape=plaintext];
   n285 -> n289;
-  n290 [label="<lista_instrucciones>", shape=box];
+  n290 [label="<resto_lista>", shape=box];
   n283 -> n290;
   n291 [label="<instruccion>", shape=box];
   n290 -> n291;
@@ -595,6 +595,10 @@ digraph arbol {
   n294 -> n295;
   n296 [label="#", shape=plaintext];
   n292 -> n296;
-  n297 [label="End", shape=plaintext];
-  n0 -> n297;
+  n297 [label="<resto_lista>", shape=box];
+  n290 -> n297;
+  n298 [label="ε", shape=plaintext];
+  n297 -> n298;
+  n299 [label="End", shape=plaintext];
+  n0 -> n299;
 }

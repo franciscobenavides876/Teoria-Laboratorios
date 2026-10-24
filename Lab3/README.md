@@ -25,14 +25,14 @@ Lab3/
 │   ├── Laboratorio_3_Informe.html    ← versión imprimible (origen del PDF)
 │   └── build_html.py                 ← regenera el HTML desde el Markdown
 └── gramatica/
-    ├── Lab3_gramatica.bnf            ← gramática G = (V, Σ, P, S) en BNF, 43 producciones
+    ├── Lab3_gramatica.bnf            ← gramática G = (V, Σ, P, S) en BNF, 45 producciones
     ├── gramatica.py                  ← validador: léxico + sintáctico + árbol + pruebas
     └── salidas/                      ← evidencia generada por gramatica.py
-        ├── validacion.txt                    (P2 y P4: resultados completos)
+        ├── validacion.txt                    (P2, P4, extensión y comentarios)
         ├── arbol_z_igual_x_mas_y.txt         (P3: árbol en texto)
         ├── arbol_z_igual_x_mas_y.dot         (P3: árbol en Graphviz)
         ├── arbol_z_igual_x_mas_y.mmd         (P3: árbol en Mermaid)
-        ├── arbol_z_igual_x_mas_y.png         (P3: captura del árbol)
+        ├── arbol_z_igual_x_mas_y.png         (P3: captura; regenerable con Graphviz)
         └── arbol_programa_referencia.dot     (P2: árbol del programa completo)
 ```
 
@@ -41,26 +41,31 @@ Lab3/
 | Pregunta | Puntos | Contenido | Dónde verlo |
 |---|:---:|---|---|
 | **P1.** Identificación formal | 20 | Terminales clasificados, no terminales, símbolo inicial, `G=(V,Σ,P,S)` y justificación de por qué no se enumeran identificadores/números. | Informe §3 |
-| **P2.** Construcción de la GLC | 30 | 43 producciones numeradas, explicación de cada no terminal, distinción asignación simple / aritmética / salida y verificación del programa de referencia. | Informe §4 + `gramatica/Lab3_gramatica.bnf` |
+| **P2.** Construcción de la GLC | 30 | 45 producciones numeradas, explicación de cada no terminal, distinción asignación simple / aritmética / salida y verificación del programa de referencia. | Informe §4 + `gramatica/Lab3_gramatica.bnf` |
 | **P3.** Derivaciones y árbol | 25 | Dos derivaciones por la izquierda, árbol de `z = x + y #`, explicación raíz/nodos/hojas y pertenencia de tres cadenas. | Informe §5 + `gramatica/salidas/arbol_*` |
 | **P4.** Validación y errores | 25 | Análisis de los 8 casos, con el elemento sintáctico faltante o mal ubicado en cada cadena inválida. | Informe §6 + `gramatica/salidas/validacion.txt` |
 | **Extensión creativa** | (transversal) | Opción A: `si … entonces … fin_si`, con sintaxis, gramática modificada, cadenas válida/inválida y derivación. | Informe §7 |
 
 ## Cómo reproducir la evidencia
 
-Requisitos: **Python 3.9+** (solo biblioteca estándar para el validador).
+Requisitos: **Python 3.9+** (solo biblioteca estándar para el validador). Para regenerar el PNG
+del árbol hace falta **Graphviz** (`dot`).
 
 ```bash
 # Valida el programa de referencia, la tabla de la P4 y la extensión,
-# y regenera la carpeta gramatica/salidas/
+# y regenera la carpeta gramatica/salidas/ (txt, dot, mmd y validacion.txt)
 python Lab3/gramatica/gramatica.py
 
 # Comprobación rápida (código de salida 0 = todos los casos coinciden)
 python Lab3/gramatica/gramatica.py --check
+
+# El PNG no lo escribe gramatica.py; se regenera desde el .dot:
+dot -Tpng Lab3/gramatica/salidas/arbol_z_igual_x_mas_y.dot \
+        -o Lab3/gramatica/salidas/arbol_z_igual_x_mas_y.png
 ```
 
-Resultado esperado: `Fallos: 0` y `Verificacion: OK`. La salida completa queda en
-`gramatica/salidas/validacion.txt`.
+Resultado esperado: `python …` imprime `Fallos: 0`; `python … --check` imprime
+`Verificacion: OK`. La salida completa queda en `gramatica/salidas/validacion.txt`.
 
 ## Cómo generar el PDF del informe
 
@@ -86,12 +91,17 @@ Opción B: extensión *Markdown PDF* de VS Code sobre `Laboratorio_3_Informe.md`
 - **Terminales como clases de token.** `ID`, `NUM` y `COMENT` son terminales únicos; su forma se
   define con expresiones regulares (Anexo A del informe). Así Σ y `P` son finitos aunque el
   lenguaje tenga infinitos identificadores y números.
-- **Asignación simple vs. aritmética.** Se separan en `P10` y `P11` para evitar ambigüedad: si
+- **Asignación simple vs. aritmética.** Se separan en `P12` y `P13` para evitar ambigüedad: si
   ambas compartieran una sola producción con `<expresion>`, `x = 20 #` tendría dos árboles.
 - **Precedencia.** `<expresion> → <termino> → <factor> → <operando>` hace que `* / %` liguen más
   fuerte que `+ -`, sin necesidad de paréntesis.
-- **Comentarios.** `/* … */` se reconoce como un token (`COMENT`) y se admite entre instrucciones
-  (`P4`); de otro modo no se podría derivar el programa de referencia completo.
+- **Asignación aritmética no ambigua.** `P14–P21` obligan a que haya al menos un operador sin
+  perder la precedencia: las variantes «no vacías» de las colas (`<resto_expresion_aritmetica>`,
+  `<resto_termino_aritmetico>`) permiten distinguir `x = 20 #` (simple) de `x = a * b #`
+  (aritmética) sin aceptar expresiones sin operador.
+- **Comentarios.** `/* … */` se reconoce como un token (`COMENT`) y se admite antes, entre y
+  después de las instrucciones (`P2–P6`); así el programa de referencia y un comentario final
+  antes de `End` o `fin_si` son derivables, sin permitir programas sin instrucciones.
 - **Extensión.** Se eligió la Opción A (condicional) por ser la construcción de control más
   representativa; no se agregó `sino` para mantener la gramática no ambigua.
 - **Sin JFLAP.** El árbol se genera con el propio analizador y se exporta a `.dot`/`.mmd`, por lo
@@ -100,7 +110,7 @@ Opción B: extensión *Markdown PDF* de VS Code sobre `Laboratorio_3_Informe.md`
 ## Checklist antes de entregar
 
 - [x] P1: terminales, no terminales, símbolo inicial y `G=(V,Σ,P,S)` definidos
-- [x] P2: gramática completa (43 producciones) + verificación del programa de referencia
+- [x] P2: gramática completa (45 producciones) + verificación del programa de referencia
 - [x] P3: derivaciones por la izquierda + árbol + explicación + pertenencia de cadenas
 - [x] P4: tabla de los 8 casos + análisis de errores
 - [x] Extensión creativa (Opción A) formalizada y validada

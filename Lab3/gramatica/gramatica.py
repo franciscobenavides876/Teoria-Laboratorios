@@ -167,7 +167,7 @@ class ErrorSintactico(Exception):
         self.mensaje = mensaje
         self.token = token
         self.esperado = esperado or []
-        detalle = f"{mensaje} (token {token.tipo} {token.lexema!r}, linea {token.linea}, columna {token.columna})"
+        detalle = f"{mensaje} en linea {token.linea}, columna {token.columna}"
         if self.esperado:
             detalle += f"; se esperaba: {', '.join(self.esperado)}"
         super().__init__(detalle)
@@ -175,7 +175,7 @@ class ErrorSintactico(Exception):
 
 # ---------------------------------------------------------------------------
 # 4. Analizador sintactico descendente recursivo
-#    Refleja exactamente las producciones del informe.
+#    Refleja exactamente las producciones de Lab3_gramatica.bnf.
 # ---------------------------------------------------------------------------
 
 
@@ -223,20 +223,31 @@ class Parser:
         nodo.agregar(self.terminal("END"))
         return nodo
 
-    # <lista_instrucciones> -> <instruccion> <lista_instrucciones>
-    #                       | <instruccion>
-    #                       | <comentario> <lista_instrucciones>
+    # <lista_instrucciones> -> <comentario> <lista_instrucciones>   (P2)
+    #                       | <instruccion> <resto_lista>          (P3)
     def lista_instrucciones(self) -> Nodo:
         nodo = Nodo("<lista_instrucciones>")
-        # <comentario> <lista_instrucciones>
         if self.actual.tipo == "COMENT":
             nodo.agregar(self.comentario())
             nodo.agregar(self.lista_instrucciones())
-            return nodo
-        # <instruccion> <lista_instrucciones> | <instruccion>
-        nodo.agregar(self.instruccion())
-        if self.inicia_instruccion() or self.actual.tipo == "COMENT":
-            nodo.agregar(self.lista_instrucciones())
+        else:
+            nodo.agregar(self.instruccion())
+            nodo.agregar(self.resto_lista())
+        return nodo
+
+    # <resto_lista> -> <instruccion> <resto_lista>                  (P4)
+    #                | <comentario> <resto_lista>                   (P5)
+    #                | epsilon                                      (P6)
+    def resto_lista(self) -> Nodo:
+        nodo = Nodo("<resto_lista>")
+        if self.inicia_instruccion():
+            nodo.agregar(self.instruccion())
+            nodo.agregar(self.resto_lista())
+        elif self.actual.tipo == "COMENT":
+            nodo.agregar(self.comentario())
+            nodo.agregar(self.resto_lista())
+        else:
+            nodo.agregar(Nodo("ε", terminal=True))
         return nodo
 
     def inicia_instruccion(self) -> bool:
@@ -259,7 +270,7 @@ class Parser:
             )
         return nodo
 
-    # <asignacion> -> <asignacion_simple> | <asignacion_aritmetica>         (P8, P9)
+    # <asignacion> -> <asignacion_simple> | <asignacion_aritmetica>         (P10, P11)
     def asignacion(self) -> Nodo:
         nodo = Nodo("<asignacion>")
         # La decision se toma mirando si el lado derecho tiene operadores.
@@ -272,7 +283,7 @@ class Parser:
     def es_asignacion_aritmetica(self) -> bool:
         """True si entre '=' y '#' aparece al menos un operador aritmetico.
 
-        Es la condicion que separa P10 (asignacion simple) de P11
+        Es la condicion que separa P12 (asignacion simple) de P13
         (asignacion con expresion): si el lado derecho es un unico
         operando se usa la via simple; si contiene cualquier operador
         (+ - * / %) se usa la via aritmetica.
@@ -306,8 +317,8 @@ class Parser:
         nodo.agregar(self.terminal("HASH", ["#"]))
         return nodo
 
-    # <expresion_aritmetica> -> <termino> <resto_expresion_aritmetica>      (P12)
-    #                        | <termino_aritmetico>                         (P13)
+    # <expresion_aritmetica> -> <termino> <resto_expresion_aritmetica>      (P14)
+    #                        | <termino_aritmetico>                         (P15)
     #
     # Ambas alternativas obligan a que la expresion contenga al menos un
     # operador (para no solaparse con <asignacion_simple>), pero respetan
@@ -339,8 +350,8 @@ class Parser:
                 return True
             k += 1
 
-    # <resto_expresion_aritmetica> -> + <termino> <resto_expresion>         (P14)
-    #                               | - <termino> <resto_expresion>         (P15)
+    # <resto_expresion_aritmetica> -> + <termino> <resto_expresion>         (P16)
+    #                               | - <termino> <resto_expresion>         (P17)
     def resto_expresion_aritmetica(self) -> Nodo:
         nodo = Nodo("<resto_expresion_aritmetica>")
         tok = self.consumir_operador({"+", "-"})
@@ -349,16 +360,16 @@ class Parser:
         nodo.agregar(self.resto_expresion())
         return nodo
 
-    # <termino_aritmetico> -> <factor> <resto_termino_aritmetico>           (P16)
+    # <termino_aritmetico> -> <factor> <resto_termino_aritmetico>           (P18)
     def termino_aritmetico(self) -> Nodo:
         nodo = Nodo("<termino_aritmetico>")
         nodo.agregar(self.factor())
         nodo.agregar(self.resto_termino_aritmetico())
         return nodo
 
-    # <resto_termino_aritmetico> -> * <factor> <resto_termino>              (P17)
-    #                             | / <factor> <resto_termino>              (P18)
-    #                             | % <factor> <resto_termino>              (P19)
+    # <resto_termino_aritmetico> -> * <factor> <resto_termino>              (P19)
+    #                             | / <factor> <resto_termino>              (P20)
+    #                             | % <factor> <resto_termino>              (P21)
     def resto_termino_aritmetico(self) -> Nodo:
         nodo = Nodo("<resto_termino_aritmetico>")
         tok = self.consumir_operador({"*", "/", "%"})
@@ -367,16 +378,16 @@ class Parser:
         nodo.agregar(self.resto_termino())
         return nodo
 
-    # <expresion> -> <termino> <resto_expresion>                            (P20)
+    # <expresion> -> <termino> <resto_expresion>                            (P22)
     def expresion(self) -> Nodo:
         nodo = Nodo("<expresion>")
         nodo.agregar(self.termino())
         nodo.agregar(self.resto_expresion())
         return nodo
 
-    # <resto_expresion> -> + <termino> <resto_expresion>                    (P21)
-    #                    | - <termino> <resto_expresion>                    (P22)
-    #                    | epsilon                                         (P23)
+    # <resto_expresion> -> + <termino> <resto_expresion>                    (P23)
+    #                    | - <termino> <resto_expresion>                    (P24)
+    #                    | epsilon                                         (P25)
     def resto_expresion(self) -> Nodo:
         nodo = Nodo("<resto_expresion>")
         if self.actual.tipo == "OP_ARIT" and self.actual.lexema in {"+", "-"}:
@@ -387,17 +398,17 @@ class Parser:
             nodo.agregar(Nodo("ε", terminal=True))
         return nodo
 
-    # <termino> -> <factor> <resto_termino>                                (P24)
+    # <termino> -> <factor> <resto_termino>                                (P26)
     def termino(self) -> Nodo:
         nodo = Nodo("<termino>")
         nodo.agregar(self.factor())
         nodo.agregar(self.resto_termino())
         return nodo
 
-    # <resto_termino> -> * <factor> <resto_termino>                        (P25)
-    #                  | / <factor> <resto_termino>                        (P26)
-    #                  | % <factor> <resto_termino>                        (P27)
-    #                  | epsilon                                           (P28)
+    # <resto_termino> -> * <factor> <resto_termino>                        (P27)
+    #                  | / <factor> <resto_termino>                        (P28)
+    #                  | % <factor> <resto_termino>                        (P29)
+    #                  | epsilon                                           (P30)
     def resto_termino(self) -> Nodo:
         nodo = Nodo("<resto_termino>")
         if self.actual.tipo == "OP_ARIT" and self.actual.lexema in {"*", "/", "%"}:
@@ -408,13 +419,13 @@ class Parser:
             nodo.agregar(Nodo("ε", terminal=True))
         return nodo
 
-    # <factor> -> <operando>                                                (P29)
+    # <factor> -> <operando>                                                (P31)
     def factor(self) -> Nodo:
         nodo = Nodo("<factor>")
         nodo.agregar(self.operando())
         return nodo
 
-    # <operando> -> <identificador> | <numero>                              (P30, P31)
+    # <operando> -> <identificador> | <numero>                              (P32, P33)
     def operando(self) -> Nodo:
         nodo = Nodo("<operando>")
         if self.actual.tipo == "ID":
@@ -429,7 +440,7 @@ class Parser:
             )
         return nodo
 
-    # <salida> -> salida <identificador> #                                   (P32)
+    # <salida> -> salida <identificador> #                                   (P34)
     def salida(self) -> Nodo:
         nodo = Nodo("<salida>")
         nodo.agregar(self.terminal("SALIDA", ["salida"]))
@@ -437,7 +448,7 @@ class Parser:
         nodo.agregar(self.terminal("HASH", ["#"]))
         return nodo
 
-    # <condicional> -> si <condicion> entonces <lista_instrucciones> fin_si  (P36)
+    # <condicional> -> si <condicion> entonces <lista_instrucciones> fin_si  (P38)
     def condicional(self) -> Nodo:
         nodo = Nodo("<condicional>")
         nodo.agregar(self.terminal("SI", ["si"]))
@@ -447,7 +458,7 @@ class Parser:
         nodo.agregar(self.terminal("FIN_SI", ["fin_si"]))
         return nodo
 
-    # <condicion> -> <expresion> <operador_relacional> <expresion>           (P37)
+    # <condicion> -> <expresion> <operador_relacional> <expresion>           (P39)
     def condicion(self) -> Nodo:
         nodo = Nodo("<condicion>")
         nodo.agregar(self.expresion())
@@ -455,28 +466,28 @@ class Parser:
         nodo.agregar(self.expresion())
         return nodo
 
-    # <operador_relacional> -> < | > | <= | >= | == | !=                  (P38-P43)
+    # <operador_relacional> -> < | > | <= | >= | == | !=                  (P40-P45)
     def operador_relacional(self) -> Nodo:
         nodo = Nodo("<operador_relacional>")
         tok = self.consumir("OP_REL", ["<", ">", "<=", ">=", "==", "!="])
         nodo.agregar(Nodo(tok.lexema, terminal=True))
         return nodo
 
-    # <identificador> -> ID                                                  (P33)
+    # <identificador> -> ID                                                  (P35)
     def identificador(self) -> Nodo:
         nodo = Nodo("<identificador>")
         tok = self.consumir("ID", ["identificador"])
         nodo.agregar(Nodo(tok.lexema, terminal=True))
         return nodo
 
-    # <numero> -> NUM                                                         (P34)
+    # <numero> -> NUM                                                         (P36)
     def numero(self) -> Nodo:
         nodo = Nodo("<numero>")
         tok = self.consumir("NUM", ["numero"])
         nodo.agregar(Nodo(tok.lexema, terminal=True))
         return nodo
 
-    # <comentario> -> COMENT                                                  (P35)
+    # <comentario> -> COMENT                                                  (P37)
     def comentario(self) -> Nodo:
         nodo = Nodo("<comentario>")
         tok = self.consumir("COMENT")
@@ -502,7 +513,9 @@ class Parser:
 
 def arbol_texto(nodo: Nodo, prefijo: str = "", es_ultimo: bool = True, raiz: bool = True) -> list[str]:
     conector = "" if raiz else ("└── " if es_ultimo else "├── ")
-    lineas = [prefijo + conector + nodo.simbolo]
+    # Un comentario puede ocupar varias lineas; en el arbol se muestra en una.
+    etiqueta = nodo.simbolo.replace("\r", " ").replace("\n", " ")
+    lineas = [prefijo + conector + etiqueta]
     if raiz:
         nuevo_prefijo = ""
     else:
@@ -513,7 +526,10 @@ def arbol_texto(nodo: Nodo, prefijo: str = "", es_ultimo: bool = True, raiz: boo
 
 
 def arbol_dot(nodo: Nodo, nombre: str = "Gramatica") -> str:
-    lineas = ["digraph arbol {", f'  label="{nombre}";', "  labelloc=t;",
+    nombre_escapado = (
+        nombre.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+    )
+    lineas = ["digraph arbol {", f'  label="{nombre_escapado}";', "  labelloc=t;",
               "  node [shape=box, fontname=Consolas, fontsize=10];"]
     contador = [0]
 
@@ -521,7 +537,12 @@ def arbol_dot(nodo: Nodo, nombre: str = "Gramatica") -> str:
         actual = contador[0]
         contador[0] += 1
         forma = "box" if not n.terminal else "plaintext"
-        etiqueta = n.simbolo.replace('"', '\\"')
+        etiqueta = (
+            n.simbolo.replace("\\", "\\\\")
+            .replace('"', '\\"')
+            .replace("\r", "")
+            .replace("\n", "\\n")
+        )
         lineas.append(f'  n{actual} [label="{etiqueta}", shape={forma}];')
         if padre is not None:
             lineas.append(f"  n{padre} -> n{actual};")
@@ -541,8 +562,14 @@ def mermaid(nodo: Nodo) -> str:
     aristas: list[str] = []
 
     def etiqueta(n: Nodo) -> str:
-        txt = n.simbolo
-        for car, ent in (("#", "#35;"), ('"', "#quot;"), ("<", "#lt;"), (">", "#gt;")):
+        txt = n.simbolo.replace("\r", " ").replace("\n", " ")
+        for car, ent in (
+            ("#", "#35;"),
+            ("&", "#38;"),
+            ('"', "#quot;"),
+            ("<", "#lt;"),
+            (">", "#gt;"),
+        ):
             txt = txt.replace(car, ent)
         return txt
 
@@ -585,6 +612,27 @@ CASOS_EXTENSION = [
      "Condicional con operador relacional de dos caracteres y salida interna."),
     ("si x == 10 entonces y = 1 # fin_si", True,
      "Condicional con el operador de igualdad '==' (dos caracteres)."),
+]
+
+# Comentarios antes, entre y despues de las instrucciones (P2-P6). No forman
+# parte de la tabla fija de 8 casos de la P4; se usan como evidencia adicional.
+CASOS_COMENTARIOS = [
+    ("Begin Programa p /* inicial */ x = 1 # End", True,
+     "Comentario antes de la primera instruccion."),
+    ("Begin Programa p x = 1 # /* entre */ y = 2 # End", True,
+     "Comentario entre dos instrucciones."),
+    ("Begin Programa p x = 1 # /* final */ End", True,
+     "Comentario despues de la ultima instruccion, antes de End."),
+    ("Begin Programa p /* solo comentario */ End", False,
+     "Un programa requiere al menos una instruccion."),
+    ("si x > 1 entonces y = 1 # /* final */ fin_si", True,
+     "Comentario final antes de fin_si."),
+    ("si x > 1 entonces /* inicial */ y = 1 # fin_si", True,
+     "Comentario al inicio del cuerpo del condicional."),
+    ("Begin Programa p si x > 1 entonces y = 1 # fin_si /* final */ End", True,
+     "Comentario final despues de un condicional, antes de End."),
+    ("si x > 1 entonces /* solo comentario */ fin_si", False,
+     "El cuerpo del condicional requiere al menos una instruccion."),
 ]
 
 # Control de precedencia: se comprueba la forma de la raiz de
@@ -660,6 +708,13 @@ def validar_instruccion(texto: str) -> tuple[bool, str, Nodo | None]:
         return False, str(e), None
 
 
+def validar_caso(texto: str) -> tuple[bool, str, Nodo | None]:
+    """Valida un programa completo o una instruccion segun su primer token."""
+    if texto.lstrip().startswith("Begin"):
+        return validar_programa(texto)
+    return validar_instruccion(texto)
+
+
 def etiquetas_hijas(arbol: Nodo | None, simbolo: str) -> list[str] | None:
     """Etiquetas de los hijos del primer nodo con `simbolo` (o None)."""
     if arbol is None:
@@ -731,10 +786,7 @@ def main() -> int:
     lineas.append(f"{'Caso':<6}{'Cadena':<30}{'Esperado':<11}{'Obtenido':<11}Estado")
     for numero, cadena, esperado, motivo in CASOS_P4:
         es_programa = cadena.lstrip().startswith("Begin")
-        if es_programa:
-            ok, msg, _ = validar_programa(cadena)
-        else:
-            ok, msg, _ = validar_instruccion(cadena)
+        ok, msg, _ = validar_caso(cadena)
         obtenido = "VALIDA" if ok else "INVALIDA"
         resultado = "OK" if ok == esperado else "FALLO"
         if ok != esperado:
@@ -756,6 +808,21 @@ def main() -> int:
     lineas.append("=" * 78)
     for cadena, esperado, motivo in CASOS_EXTENSION:
         ok, msg, _ = validar_instruccion(cadena)
+        if ok != esperado:
+            fallos += 1
+        lineas.append(f"Cadena   : {cadena}")
+        lineas.append(f"Esperado : {'VALIDA' if esperado else 'INVALIDA'}")
+        lineas.append(f"Obtenido : {'VALIDA' if ok else 'INVALIDA'} - {msg}")
+        lineas.append(f"Motivo   : {motivo}")
+        lineas.append("")
+    lineas.append("")
+
+    # --- Comentarios antes, entre y despues de las instrucciones ------------
+    lineas.append("=" * 78)
+    lineas.append("COMENTARIOS - antes, entre y despues de las instrucciones")
+    lineas.append("=" * 78)
+    for cadena, esperado, motivo in CASOS_COMENTARIOS:
+        ok, msg, _ = validar_caso(cadena)
         if ok != esperado:
             fallos += 1
         lineas.append(f"Cadena   : {cadena}")
@@ -801,16 +868,18 @@ def main() -> int:
 if __name__ == "__main__":
     if "--check" in sys.argv:
         errores = 0
-        for numero, cadena, esperado, _ in CASOS_P4:
-            if cadena.lstrip().startswith("Begin"):
-                ok, _, _ = validar_programa(cadena)
-            else:
-                ok, _, _ = validar_instruccion(cadena)
+        for _, cadena, esperado, _ in CASOS_P4:
+            ok, _, _ = validar_caso(cadena)
             errores += ok != esperado
-        ok, _, _ = validar_programa(PROGRAMA_REFERENCIA)
+        ok, _, arbol_ref = validar_programa(PROGRAMA_REFERENCIA)
         errores += not ok
+        hojas_ref = [t.lexema for t in tokenizar(PROGRAMA_REFERENCIA) if t.tipo != "EOF"]
+        errores += not (ok and arbol_ref is not None and hojas(arbol_ref) == hojas_ref)
         for cadena, esperado, _ in CASOS_EXTENSION:
             ok, _, _ = validar_instruccion(cadena)
+            errores += ok != esperado
+        for cadena, esperado, _ in CASOS_COMENTARIOS:
+            ok, _, _ = validar_caso(cadena)
             errores += ok != esperado
         for cadena, esperado in CASOS_PRECEDENCIA:
             ok, _, arbol = validar_instruccion(cadena)
