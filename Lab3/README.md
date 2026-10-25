@@ -1,77 +1,54 @@
-﻿# Laboratorio 3 — Diseño y Validación de Gramáticas
+﻿# Laboratorio 3: Gramáticas Libres de Contexto
 
-**Asignatura:** Teoría de la Computación — INFO1148
-**Tema:** Gramáticas Libres de Contexto (GLC)
-**Modalidad:** Laboratorio práctico (parejas)
-**Puntaje:** 100 puntos
-**Entrega:** Evidencias (validador + gramática + salidas)
+**Integrantes:** Francisco Benavides · Marcelo Matamala  
+**Asignatura:** Teoría de la Computación – INFO1148  
+**Carrera:** Ingeniería Civil en Informática  
+**Docente:** Marcos Lévano
 
-Esta carpeta (`Lab3/`) contiene el desarrollo completo de la Pregunta 1 a la Pregunta 4, la
-extensión creativa y las evidencias de ejecución del Laboratorio 3.
+## Objetivo
 
-| Integrante | |
-|---|---|
-| Francisco Benavides | `franciscobenavides876` |
-| Marcelo Matamala | — |
+Diseñar, analizar y validar una Gramática Libre de Contexto (GLC) que represente la estructura sintáctica de un lenguaje de programación simplificado. El trabajo consiste en identificar sus componentes formales, construir las producciones, realizar derivaciones por la izquierda, generar el árbol sintáctico y comprobar la pertenencia de cadenas válidas e inválidas.
 
-## Estructura
+## ¿Qué se trabajó?
 
-```text
+Este laboratorio aborda los siguientes aspectos:
+
+- **Componentes formales**: Se definieron los símbolos terminales (incluyendo clases de token como ID, NUM y COMENT), los símbolos no terminales, el símbolo inicial y la gramática G = (V, Σ, P, S).
+- **Construcción de la GLC**: Se plantearon las producciones necesarias para reconocer un bloque Begin ... End, un identificador de programa, asignaciones simples y aritméticas, instrucciones de salida, comentarios y una o más instrucciones.
+- **Jerarquía de expresiones**: Se estructuró la gramática con precedencia para los operadores aritméticos (+ - * / %), distinguiendo correctamente entre una asignación simple (x = 20 #) y una asignación con expresión aritmética (z = x + y #).
+- **Derivaciones y árbol sintáctico**: Se realizaron derivaciones por la izquierda para cadenas solicitadas, se construyó el árbol de derivación correspondiente y se justificó la relación entre nodos, hojas, terminales y no terminales.
+- **Validación sintáctica**: Se analizaron cadenas válidas e inválidas, identificando el primer error sintáctico con su token, línea, columna y el símbolo esperado.
+- **Extensión creativa**: Se incorporó el condicional si ... entonces ... fin_si (Opción A), reutilizando la jerarquía de expresiones y la lista de instrucciones, sin agregar sino para mantener la gramática no ambigua.
+
+## Estructura del repositorio
+
+`	ext
 Lab3/
 ├── README.md
 └── gramatica/
-    ├── Lab3_gramatica.bnf            ← gramática G = (V, Σ, P, S) en BNF, 45 producciones
-    ├── gramatica.py                  ← validador: léxico + sintáctico + árbol + pruebas
-    └── salidas/                      ← evidencia generada por gramatica.py
-        ├── validacion.txt
-        ├── arbol_z_igual_x_mas_y.txt
-        ├── arbol_z_igual_x_mas_y.dot
-        ├── arbol_z_igual_x_mas_y.mmd
-        ├── arbol_z_igual_x_mas_y.png
-        └── arbol_programa_referencia.dot
-```
+    ├── Lab3_gramatica.bnf      # Gramática en BNF con 45 producciones numeradas P1–P45
+    ├── gramatica.py            # Analizador léxico-sintáctico descendente recursivo
+    └── salidas/
+        ├── validacion.txt                # Evidencia de validación (programa de referencia, P4, extensión)
+        ├── arbol_z_igual_x_mas_y.txt     # Árbol de derivación en formato texto
+        ├── arbol_z_igual_x_mas_y.dot     # Árbol en formato Graphviz
+        ├── arbol_z_igual_x_mas_y.mmd     # Árbol en formato Mermaid
+        ├── arbol_z_igual_x_mas_y.png     # Captura del árbol de derivación
+        └── arbol_programa_referencia.dot # Árbol del programa de referencia completo
+`
 
-## Qué se entrega en cada pregunta
+## Funcionamiento
 
-| Pregunta | Puntos | Contenido | Dónde verlo |
-|---|:---:|---|---|
-| **P1.** Identificación formal | 20 | Terminales clasificados, no terminales, símbolo inicial, `G=(V,Σ,P,S)` y justificación de por qué no se enumeran identificadores/números. | `gramatica/Lab3_gramatica.bnf` + `gramatica/gramatica.py` |
-| **P2.** Construcción de la GLC | 30 | 45 producciones numeradas, explicación, distinción asignación simple / aritmética / salida y verificación del programa de referencia. | `gramatica/Lab3_gramatica.bnf` + `gramatica/salidas/validacion.txt` |
-| **P3.** Derivaciones y árbol | 25 | Dos derivaciones por la izquierda, árbol de `z = x + y #`, explicación raíz/nodos/hojas y pertenencia de tres cadenas. | `gramatica/salidas/arbol_*` |
-| **P4.** Validación y errores | 25 | Análisis de los 8 casos, con el elemento sintáctico faltante o mal ubicado en cada cadena inválida. | `gramatica/salidas/validacion.txt` |
-| **Extensión creativa** | (transversal) | Opción A: `si … entonces … fin_si`, formalizada y validated. | `gramatica/gramatica.py` + `gramatica/salidas/validacion.txt` |
+El archivo gramatica/gramatica.py implementa un **lexer y parser descendente recursivo** que sigue exactamente las producciones definidas en Lab3_gramatica.bnf. A partir de este analizador se generan las evidencias en la carpeta salidas/, entre ellas la validación del programa de referencia, la tabla de casos de prueba, los resultados de la extensión y el árbol de derivación.
 
-## Cómo reproducir la evidencia
+Para reproducir la evidencia:
 
-Requisitos: **Python 3.9+** (solo biblioteca estándar).
-
-```bash
-# Valida el programa de referencia, la tabla de P4 y la extensión
+`ash
+# Validación completa y generación de salidas
 python Lab3/gramatica/gramatica.py
 
-# Comprobación rápida (código de salida 0 = todos los casos coinciden)
+# Verificación rápida
 python Lab3/gramatica/gramatica.py --check
-```
+`
 
-Resultado esperado: `python …` imprime `Fallos: 0`; `python … --check` imprime `Verificacion: OK`. La salida completa queda en `gramatica/salidas/validacion.txt`.
-
-## Notas y decisiones de diseño
-
-- **Terminales como clases de token.** `ID`, `NUM` y `COMENT` are terminales únicos; su forma se define con expresiones regulares. Así Σ y `P` son finitos aunque el lenguaje tenga infinitos identificadores y números.
-- **Asignación simple vs. aritmética.** Se separan en `P12` y `P13` para evitar ambigüedad.
-- **Precedencia.** `<expresion> → <termino> → <factor> → <operando>` hace que `* / %` liguen más fuerte que `+ -`.
-- **Comentarios.** `/* … */` se reconoce como `COMENT` y se admite antes, entre y después de las instrucciones.
-- **Extensión.** Se eligió la Opción A (`si … entonces … fin_si`) sin `sino` para mantener la gramática no ambigua.
-- **Sin JFLAP.** El árbol se genera con el propio analizador y se exporta a `.dot`/`.mmd`.
-
-## Checklist antes de entregar
-
-- [x] P1: terminales, no terminales, símbolo inicial and `G=(V,Σ,P,S)` definidos
-- [x] P2: gramática completa (45 producciones) + verificación del programa de referencia
-- [x] P3: derivaciones por la izquierda + árbol + explicación + pertenencia de cadenas
-- [x] P4: tabla de los 8 casos + análisis de errores
-- [x] Extensión creativa (Opción A) formalizada and validated
-- [x] Evidencia ejecutable (`gramatica.py` → `Fallos: 0`)
-- [x] Archivos `.dot`/.mmd`/`.txt`/`.png` del árbol de derivación
-- [x] Informe entregado desde Overleaf (PDF)
-- [x] Integrantes completos: Francisco Benavides y Marcelo Matamala
+El resultado esperado es Verificacion: OK con Fallos: 0.
